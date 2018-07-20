@@ -57,7 +57,6 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 try {
-fdslbfdsj,fnl,sdf
                     storeAlias(aliasSpinner.getSelectedItem().toString());
                 } catch (Exception e){
                     Toast.makeText(getActivity(), R.string.error_try_again, Toast.LENGTH_SHORT).show();

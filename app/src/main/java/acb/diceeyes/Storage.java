@@ -62,6 +62,10 @@ public class Storage extends SQLiteOpenHelper {
     public static final String storage_user_name = "Alias";
     public static final String storage_user_index = "Alias Index";
     public static final String storage_alarm_pref = "Alarm Storage";
+    public static final String storage_alarmStartStop_pref = "Start Stop Storage";
+    public static final String storage_alarmStart_index = "Start Index";
+    public static final String storage_alarmStop_index = "Stop Index";
+
 
     public static final String SQL_CREATEDATA =
             "CREATE TABLE " + DB_TABLE +
@@ -98,46 +102,51 @@ public class Storage extends SQLiteOpenHelper {
     public static final String STORAGEPATHIMG = "storage/emulated/0/DiceEyes/images";
     public static final String STORAGEPATHLOG = "storage/emulated/0/DiceEyes/debug";
 
-    private SharedPreferences userNameStorage;
-    private SharedPreferences.Editor userNameEditor;
+    private SharedPreferences userAliasStorage;
+    private SharedPreferences.Editor userAliasEditor;
 
     private SharedPreferences ranomAlarmsStorage;
     private SharedPreferences.Editor ranomAlarmsEditor;
 
+    private SharedPreferences alarmStartStopStorage;
+    private SharedPreferences.Editor alarmStartStopEditor;
 
     public Storage(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         Log.v(TAG, "Database created " + getDatabaseName());
         new File(STORAGEPATHIMG).mkdirs();
         new File(STORAGEPATHLOG).mkdirs();
-        userNameStorage = context.getSharedPreferences(storage_user_pref, 0);
-        userNameEditor = userNameStorage.edit();
+        userAliasStorage = context.getSharedPreferences(storage_user_pref, 0);
+        userAliasEditor = userAliasStorage.edit();
 
         ranomAlarmsStorage = context.getSharedPreferences(storage_alarm_pref, 0);
         ranomAlarmsEditor = ranomAlarmsStorage.edit();
+
+        alarmStartStopStorage = context.getSharedPreferences(storage_alarmStartStop_pref, 0);
+        alarmStartStopEditor = alarmStartStopStorage.edit();
     }
 
     public String getAlias(){
-        return userNameStorage.getString(storage_user_name, null);
+        return userAliasStorage.getString(storage_user_name, null);
     }
 
     public int getAliasIndex(){
-        return userNameStorage.getInt(storage_user_index, 0);
+        return userAliasStorage.getInt(storage_user_index, 0);
     }
 
     public void setAlias(Context context, String input, int index){
         try {
-            userNameEditor.putString(storage_user_name, input);
-            userNameEditor.putInt(storage_user_index, index);
-            userNameEditor.commit();
+            userAliasEditor.putString(storage_user_name, input);
+            userAliasEditor.putInt(storage_user_index, index);
+            userAliasEditor.commit();
             Log.d(TAG, "Alias stored: " + input);
         } catch (Exception e){
         }
     }
 
     protected void deleteAlias(){
-        userNameEditor.putString(storage_user_name, null);
-        userNameEditor.commit();
+        userAliasEditor.putString(storage_user_name, null);
+        userAliasEditor.commit();
     }
 
     public void setRandomWasTakenInCurrentPeriod(int period, boolean wasTaken){
@@ -162,8 +171,19 @@ public class Storage extends SQLiteOpenHelper {
         ranomAlarmsEditor.commit();
     }
 
-    protected String getStoragePath(){
+    public String getStoragePath(){
         return STORAGEPATHIMG;
+    }
+
+    //TODO: set start mit date
+    public void setAlarmStart(Context context, String input, int index){
+        /*try {
+            userAliasEditor.putString(storage_user_name, input);
+            userAliasEditor.putInt(storage_user_index, index);
+            userAliasEditor.commit();
+            Log.d(TAG, "Alias stored: " + input);
+        } catch (Exception e){
+        }*/
     }
 
     @Override

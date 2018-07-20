@@ -14,6 +14,18 @@
         tools:layout_editor_absoluteY="0dp"
         tools:ignore="MissingConstraints">
 
+        <EditText
+            android:id="@+id/editTextTimeTest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="time" />
+
+        <ImageButton
+            android:id="@+id/startStopButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/ic_lock_power_off" />
     </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

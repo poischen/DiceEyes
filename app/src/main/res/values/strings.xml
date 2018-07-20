@@ -22,6 +22,13 @@
     <!-- Miscs and globals -->
     <string name="global_date_pattern">dd-MM-yy_HH-mm-ss</string>
 
+    <!-- Notifications -->
+    <string name="notifications_title">Dice Eyes</string>
+    <string name="notifications_generic">Service is running. Thanks for participating :)</string>
+
+    <!-- Intent communication -->
+    <string name="extra_requestid">requestID</string>
+
     <!-- Settings -->
     <string name="settings_name">Study alias</string>
     <string name="settings_time_start">Start daily</string>
@@ -51,8 +58,5 @@
         <item>Sul</item>
         <item>Tanqueray</item>
     </string-array>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

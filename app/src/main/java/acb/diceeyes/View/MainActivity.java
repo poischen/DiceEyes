@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.io.File;
@@ -17,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import acb.diceeyes.AlarmControll.AlarmService;
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
@@ -25,7 +28,10 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
     private Storage storage;
+
+    private ImageButton startStopButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +39,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         storage = new Storage(getApplicationContext());
+
+        startStopButton = (ImageButton) findViewById(R.id.startStopButton);
+
+
+        startStopButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startAlarmService();
+            }
+        });
     }
 
     @Override
@@ -113,6 +128,11 @@ public class MainActivity extends AppCompatActivity {
         getApplicationContext().startActivity(shareIntent);
     }
 
+    /*Starts a longlasting Service which controlls and triggers the gaze grid */
+    private void startAlarmService(){
+        Intent controllerIntent = new Intent(this, AlarmService.class);
+        getApplicationContext().startService(controllerIntent);
+    }
 
     public Storage getStorage(){
         return this.storage;
