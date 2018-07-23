@@ -17,7 +17,8 @@ import java.util.Observer;
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
-public class AlarmService extends Service implements Observer {
+//public class AlarmService extends Service implements Observer {
+public class AlarmService {
 
     private static final String TAG = AlarmService.class.getSimpleName();
 
@@ -30,7 +31,7 @@ public class AlarmService extends Service implements Observer {
         super();
     }
 
-    @Override
+  /*  @Override
     public void onCreate() {
         super.onCreate();
         Log.v(TAG, "AlarmService created.");
@@ -39,8 +40,7 @@ public class AlarmService extends Service implements Observer {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        /**Starting the Shooting after inizialising the user name in order to test if everything works
-         */
+        //Starting the Shooting after inizialising the user name in order to test if everything works
             //Bundle extras = intent.getExtras();
             storage = new Storage(getApplicationContext());
             storagePath = storage.getStoragePath();
@@ -61,7 +61,7 @@ public class AlarmService extends Service implements Observer {
 
         return START_STICKY;
     }
-
+*/
     //TODO: Überarbeiten nach neuer Logik
     /*
    sets 6 random daily alarms between 10 am and 22 pm, where pictures should be taken
@@ -106,7 +106,8 @@ public class AlarmService extends Service implements Observer {
             alarmManager.setRepeating(AlarmManager.RTC, c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
         }*/
 
-        //set data transfer alarm
+        //TODO: AB heir überarbeiten
+/*        //set data transfer alarm
         IntentFilter reminderFilter = new IntentFilter("com.example.anita.hdyhyp.ReminderAlarmReceiver");
         reminderAlarmReceiver = new ReminderAlarmReceiver();
         registerReceiver(reminderAlarmReceiver, reminderFilter);
@@ -198,24 +199,7 @@ public class AlarmService extends Service implements Observer {
 
         //cancel random alarms
         // not necessary since new algorithm
-        /*int a = randomPendingIntentArray.size();
-        if (a != 0){
-        for (int i=0; i<a; i++){
-            alarmManager.cancel(randomPendingIntentArray.get(i));
-        }
-        }
-        if (randomAlarmReceiver != null) {
-            unregisterReceiver(randomAlarmReceiver);
-            randomAlarmReceiver = null;
-        }
 
-        Log.v(TAG, "random alarms canceled & receiver unregistered");*/
-
-        //stop detecting apps thread
-        /*if (appDetectionThread != null) {
-            appDetectionThread.interrupt();
-            Log.v(TAG, "appDetection interrupted");
-        }*/
         isScreenActive = false;
 
         //stop Controller Service
@@ -241,7 +225,7 @@ public class AlarmService extends Service implements Observer {
             } else if (action.contains("EventAlarmReceiver")) {
                 startCapturePictureService(capturingEvent);
                 Log.v(TAG, "event has not changed, capture pic again");
-            /*remove pending intent from list
+            remove pending intent from list
             ObservableObject.getInstance().getPendingIntentRequestID();
 
             int size = eventPendingIntentArray.size();
@@ -249,7 +233,7 @@ public class AlarmService extends Service implements Observer {
                 for (int i = 0; i < size; i++) {
                     if (eventPendingIntentArray.get(i).get)
                 }
-            }*/
+            }
 
             } else if (action.contains("StatusBarNotification")) {
                 //check if notification is new
@@ -335,9 +319,6 @@ public class AlarmService extends Service implements Observer {
         //set alarms for taking pictures for the incoming event
         long currentTimeMillis = System.currentTimeMillis();
 
-        /*Calendar currentTime = Calendar.getInstance();
-        currentTime.setTimeInMillis(System.currentTimeMillis());
-        Calendar calendar = (Calendar) currentTime.clone();*/
 
         int requestId = 80;
 
@@ -433,7 +414,7 @@ public class AlarmService extends Service implements Observer {
                 startDataCollectionService("collect", getApplicationContext(), currentForegroundApp, capturingEvent, s, NASTRING, NASTRING, NASTRING, NASTRING, NASTRING, NASTRING, NASTRING);
             }
             return false;
-        }*/
-    }
+        }
+    }*/
 
-}
+}}

@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private Storage storage;
 
     private ImageButton startStopButton;
+    private Button testbutton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,13 @@ public class MainActivity extends AppCompatActivity {
 
         startStopButton = (ImageButton) findViewById(R.id.startStopButton);
 
+        testbutton = (Button) findViewById(R.id.testbutton);
+        testbutton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, GazeGrid.class);
+                MainActivity.this.startActivity(intent);
+            }
+        });
 
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

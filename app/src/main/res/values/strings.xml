@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">DiceEyes</string>
+    <string name="title_activity_gaze_grid"></string>
 
     <!-- Menu -->
     <string name="menu_item_settings">Settings</string>
@@ -19,8 +20,14 @@
     <string name="log_mail_msg">Please find attached the latest logfile.</string>
     <string name="log_mail_intent_title">Send mail...</string>
 
-    <!-- Miscs and globals -->
+    <!-- Miscsm, toats and globals -->
     <string name="global_date_pattern">dd-MM-yy_HH-mm-ss</string>
+    <string name="toast_rescheduled">We\'ll do that later.</string>
+    <string name="gazegrid_alertdialog_title">Confirm</string>
+    <string name="gazegrid_alertdialog_content">Have you been looking at the point?</string>
+    <string name="gazegrid_alertdialog_buttonok">Yes</string>
+    <string name="gazegrid_alertdialog_buttonredo">Nope</string>
+    <string name="gazegrid_toast_ok">Thanks!</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Dice Eyes</string>
