@@ -22,6 +22,7 @@
 
     <!-- Miscsm, toats and globals -->
     <string name="global_date_pattern">dd-MM-yy_HH-mm-ss</string>
+    <string name="global_photofile_format">.jpg</string>
     <string name="toast_rescheduled">We\'ll do that later.</string>
     <string name="gazegrid_alertdialog_title">Confirm</string>
     <string name="gazegrid_alertdialog_content">Have you been looking at the point?</string>

@@ -49,6 +49,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_gaze_grid"
             android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+
+        <service android:name=".Collection.CapturePhotoService"></service>
     </application>
+
+
 
 </manifest>

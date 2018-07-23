@@ -1,24 +1,17 @@
 package acb.diceeyes.View;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import acb.diceeyes.AlarmControll.AlarmService;
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 import acb.diceeyes.Collection.*;
@@ -52,14 +45,15 @@ public class GazeGrid extends AppCompatActivity {
 
     }
 
-    private void startCapturePictureService() {
+    private void startCapturePhotoService() {
         //start taking the picture, the CapurePicService will run the DataCollection when it is finished taking the pic
-        Intent capturePicServiceIntent = new Intent(this, CapturePhotoService.class);
-        getApplicationContext().startService(capturePicServiceIntent);
-        Log.v(TAG, "CapturePicService will be started now");
+        Intent capturePhotoServiceIntent = new Intent(this, CapturePhotoService.class);
+        startService(capturePhotoServiceIntent);
+        Log.v(TAG, "CapturePhotoService will be started now");
 
         //ask if the user really looked at the circle
         showConfirmation();
+
     }
 
     public void showConfirmation(){
@@ -99,7 +93,7 @@ public class GazeGrid extends AppCompatActivity {
         //recognize long pressong for capturing the camera
         @Override
         public void onLongPress(MotionEvent e) {
-            startCapturePictureService();
+            startCapturePhotoService();
         }
     }
 }

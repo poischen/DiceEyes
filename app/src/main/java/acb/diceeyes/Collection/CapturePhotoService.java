@@ -1,25 +1,25 @@
 package acb.diceeyes.Collection;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.IBinder;
 import android.util.Log;
-import android.util.SparseArray;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import acb.diceeyes.AlarmControll.ObservableObject;
+import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
 /**
@@ -37,9 +37,9 @@ public class CapturePhotoService extends Service {
     private SurfaceTexture surfaceTexture;
     private String photoName;
 
-    public CapturePhotoService()
-    {
+    public CapturePhotoService() {
         super();
+        Log.v(TAG, "CapturePhotoService() Constructor");
     }
 
     @Override
@@ -57,7 +57,7 @@ public class CapturePhotoService extends Service {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d(TAG, "camera instance not found" + e);
+            Log.v(TAG, "camera instance not found" + e);
             //TODO: reschedule Alarm
         }
 
@@ -100,10 +100,10 @@ public class CapturePhotoService extends Service {
         Camera c = null;
         if (!getPackageManager()
                 .hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-            Log.d(TAG, "No camera found. Error code 1.");
+            Log.v(TAG, "No camera found. Error code 1.");
         } else {
             if (camId < 0) {
-                Log.d(TAG, "No camera found. Error code 2, camera ID " + camId);
+                Log.v(TAG, "No camera found. Error code 2, camera ID " + camId);
             } else {
                 if (c != null) {
                     c.release();
@@ -117,72 +117,25 @@ public class CapturePhotoService extends Service {
     }
 
     //creates the CameraPictureCallback, starts the camera preview and let the picture be taken
-    private synchronized void capturePhoto() throws InterruptedException {
+    private void capturePhoto() throws InterruptedException {
         Log.v(TAG, "capturePhoto() hase been called.");
-        //pictureIsCurrentlyTaken = true;
 
         CameraPictureCallback pictureCallBack = new CameraPictureCallback(this);
         camera.startPreview();
-
-        /*if (Build.VERSION.SDK_INT < 17) {
-            Camera.Parameters params = camera.getParameters();
-            if (params.getMaxNumDetectedFaces() > 0) {
-                camera.setFaceDetectionListener(new FaceDetectionListener());
-                camera.startFaceDetection();
-            } else {
-                Log.e(TAG, "Face detection is not supported.");
-            }
-        }*/
 
         //taking the picture
         try {
             camera.takePicture(null, null, pictureCallBack);
         } catch (Exception e) {
-            Log.d(TAG, "camera.takePicture failed");
+            Log.v(TAG, "camera.takePicture failed");
         }
-        //pictureIsCurrentlyTaken = false;
-    }
-
-    /* after picture was taken, the method detects face landmarks in the detected faces, which should be stored in the surveys database,
-    * it releases the camera and the detector and starts the DataCollectorService
-    */
-    public void finishCapturing(Bitmap picture, File capturedPhotoFile){
-
-     /*   Canvas canvas = new Canvas(picture);
-        Paint paint = new Paint();
-        paint.setColor(Color.YELLOW);
-*/
-
-        try {
-            FileOutputStream fos = new FileOutputStream(capturedPhotoFile);
-                        picture.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            Log.e(TAG, "File not found: " + e.getMessage());
-            e.getStackTrace();
-        } catch (IOException e) {
-            Log.e(TAG, "I/O error writing file: " + e.getMessage());
-            e.getStackTrace();
-        }
-
-        try {
-            camera.release();
-        } catch (Exception e){
-            Log.d(TAG, "Camera could not be released: " + e);
-        }
-
-        startDataCollection();
-        ControllerService.startDataCollectionService("collect", getApplicationContext(), foregroundApp, capturingEvent, pictureName, leftEyePoints, rightEyePoints, mouthPoints, eulerY, eulerZ, rightEyeOpen, leftEyeOpen);
-        camera = null;
     }
 
 
-    public void setPictureName(String pictureName) {
-        this.pictureName = pictureName;
+    public void setPhotoName(String pictureName) {
+        this.photoName = pictureName;
     }
 
-    //processes the picture while taking the photo and detects the faces on the bitmap, calls finishCapturing() after processing is done
     public class CameraPictureCallback implements Camera.PictureCallback {
 
         private String pictureName;
@@ -229,17 +182,14 @@ public class CapturePhotoService extends Service {
 
             Log.v(TAG, "data collection gets started.");
 
-            //detect faces on the bitmap with google play service
-            if (!(faceDetector == null) && faceDetector.isOperational()) {
-                Log.v(TAG, "face detector is operational");
-                Frame frame = new Frame.Builder().setBitmap(rotatedImage).build();
-                faces = faceDetector.detect(frame);
-                Log.v(TAG, "face detector detected number of faces: " + faces.size());
-            } else {
-                Log.v(TAG, "face detector is not operational.");
+            cps.setPhotoName(photoName);
+            try {
+                camera.release();
+            } catch (Exception e){
+                Log.v(TAG, "Camera could not be released: " + e);
             }
-            cps.setPictureName(pictureName);
-            cps.finishCapturing(rotatedImage, capturedPhotoFile);
+            startDataCollectionService( "foregroundApp", "photoName");
+            camera = null;
         }
 
         //helpermethod
@@ -247,17 +197,17 @@ public class CapturePhotoService extends Service {
             Log.v(TAG, "getOutputMediaFile() called.");
             File filePath = new File(storagePath);
             Log.v(TAG, "File created.");
-            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yy_HH:mm:ss");
+            DateFormat dateFormat = new SimpleDateFormat(String.valueOf(R.string.global_date_pattern));
             String timeString = dateFormat.format(new Date());
-            pictureName = userName + "_" + timeString + ".jpg";
+            photoName = userName + "_" + timeString + String.valueOf(R.string.global_photofile_format);
             return new File(filePath.getPath() + File.separator + pictureName);
         }
 
     }
 
-    public static void startDataCollectionService(Context context, String foregroundApp, String photoName) {
+    public void startDataCollectionService(String foregroundApp, String photoName) {
        //TODO: implement DataCollectorService
-        /* Intent dataCollectionIntent = new Intent(context, DataCollectorService.class);
+        /* Intent dataCollectionIntent = new Intent(getApplicationContext(, DataCollectorService.class);
             dataCollectionIntent.putExtra(DataCollectorService.FOREGROUNDAPP, foregroundApp);
             dataCollectionIntent.putExtra(DataCollectorService.PHOTONAME, photoName);
             if (ObservableObject.getInstance().isOrientationPortrait()) {
@@ -265,7 +215,7 @@ public class CapturePhotoService extends Service {
             } else {
                 dataCollectionIntent.putExtra(DataCollectorService.ORIENTATION, DataCollectorService.LANDSCAPE);
             }
-        context.startService(dataCollectionIntent);*/
+        getApplicationContext(.startService(dataCollectionIntent);*/
     }
 
 }
