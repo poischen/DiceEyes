@@ -24,7 +24,7 @@ public class AlarmService {
 
     private AlarmManager alarmManager;
     private AlarmReceiver alarmReceiver;
-    private Storage storage;
+    public static Storage storage;
     private String storagePath;
 
     public AlarmService() {

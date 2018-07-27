@@ -36,6 +36,9 @@
 
     <!-- Intent communication -->
     <string name="extra_requestid">requestID</string>
+    <string name="extra_capturingevent">CapturingEvent</string>
+    <string name="extra_capturingevent_init">init</string>
+    <string name="extra_capturingevent_normal">normal</string>
 
     <!-- Settings -->
     <string name="settings_name">Study alias</string>
