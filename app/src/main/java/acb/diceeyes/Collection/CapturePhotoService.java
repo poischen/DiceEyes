@@ -36,6 +36,7 @@ public class CapturePhotoService extends Service {
     private String userName;
     private SurfaceTexture surfaceTexture;
     private String photoName;
+    private String event;
 
     public CapturePhotoService() {
         super();
@@ -53,6 +54,9 @@ public class CapturePhotoService extends Service {
             camera = getCameraInstance();
             surfaceTexture = new SurfaceTexture(0);
             camera.setPreviewTexture(surfaceTexture);
+
+            event = (String) intent.getExtras().get(String.valueOf(R.string.extra_capturingevent));
+
             capturePhoto();
 
         } catch (Exception e) {
@@ -132,8 +136,8 @@ public class CapturePhotoService extends Service {
     }
 
 
-    public void setPhotoName(String pictureName) {
-        this.photoName = pictureName;
+    public void setPhotoName(String name) {
+        this.photoName = name;
     }
 
     public class CameraPictureCallback implements Camera.PictureCallback {
@@ -147,7 +151,6 @@ public class CapturePhotoService extends Service {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            //pictureIsCurrentlyTaken = true;
             File capturedPhotoFile = getOutputMediaFile();
             if (capturedPhotoFile == null) {
                 Log.e(TAG, "Could not create file");
@@ -182,13 +185,12 @@ public class CapturePhotoService extends Service {
 
             Log.v(TAG, "data collection gets started.");
 
-            cps.setPhotoName(photoName);
             try {
                 camera.release();
             } catch (Exception e){
                 Log.v(TAG, "Camera could not be released: " + e);
             }
-            startDataCollectionService( "foregroundApp", "photoName");
+            startDataCollectionService( "foregroundApp TODO!");
             camera = null;
         }
 
@@ -205,17 +207,12 @@ public class CapturePhotoService extends Service {
 
     }
 
-    public void startDataCollectionService(String foregroundApp, String photoName) {
-       //TODO: implement DataCollectorService
-        /* Intent dataCollectionIntent = new Intent(getApplicationContext(, DataCollectorService.class);
-            dataCollectionIntent.putExtra(DataCollectorService.FOREGROUNDAPP, foregroundApp);
-            dataCollectionIntent.putExtra(DataCollectorService.PHOTONAME, photoName);
-            if (ObservableObject.getInstance().isOrientationPortrait()) {
-                dataCollectionIntent.putExtra(DataCollectorService.ORIENTATION, DataCollectorService.PORTAIT);
-            } else {
-                dataCollectionIntent.putExtra(DataCollectorService.ORIENTATION, DataCollectorService.LANDSCAPE);
-            }
-        getApplicationContext(.startService(dataCollectionIntent);*/
+    public void startDataCollectionService(String foregroundApp) {
+        Intent dataCollectionIntent = new Intent(getApplicationContext(), DataCollectionService.class);
+            dataCollectionIntent.putExtra(DataCollectionService.FOREGROUNDAPP, foregroundApp);
+            dataCollectionIntent.putExtra(DataCollectionService.PICTURENAME, photoName);
+            dataCollectionIntent.putExtra(String.valueOf(R.string.extra_capturingevent), event);
+        getApplicationContext().startService(dataCollectionIntent);
     }
 
 }

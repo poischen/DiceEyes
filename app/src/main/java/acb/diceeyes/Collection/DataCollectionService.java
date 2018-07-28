@@ -17,6 +17,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.nfc.Tag;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,7 +30,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import acb.diceeyes.AlarmControll.AlarmService;
+import acb.diceeyes.AlarmControll.ControlleService;
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
@@ -43,11 +44,9 @@ public class DataCollectionService extends Service implements LocationListener, 
     public static final int NAINT = -11;
     public static final String FOREGROUNDAPP = "foregroundApp";
     public static final String PICTURENAME = "pictureName";
-    public static final String ORIENTATION = "orientation";
     public static final String PORTAIT = "portrait";
     public static final String LANDSCAPE = "landscape";
-    public static final String PATH = "path";
-    public static final String SUBMITTIME = "submitTime";
+    public static final String GAZEPOINTPOSITION = "gazePointPosition";
     private static final String TAG = DataCollectionService.class.getSimpleName();
     String accelerometerSensor = NASTRING;
     String gyroscopeSensor = NASTRING;
@@ -70,8 +69,9 @@ public class DataCollectionService extends Service implements LocationListener, 
     int screenBrightness = NAINT;
     String batteryStatus = NASTRING;
     int batteryLevel = NAINT;
+    int gazePoint = NAINT;
     private SQLiteDatabase database;
-    private Storage storage = AlarmService.storage;
+    private Storage storage = ControlleService.storage;
     private SensorManager sensorManager;
     private LocationManager locationManager;
     private Location latestLocation;
@@ -118,11 +118,20 @@ public class DataCollectionService extends Service implements LocationListener, 
         try {
             //TODO: stimmt das?
             capturingEvent = (String) intent.getExtras().get(String.valueOf(R.string.extra_capturingevent));
+            Log.v(TAG, "capturingEvent onStartCommand: " + capturingEvent);
         } catch (Exception e) {
             Log.v(TAG, "onStartCommand intent null");
         }
 
-        if (capturingEvent.equals(String.valueOf(R.string.extra_capturingevent_normal))) {
+        try {
+            //TODO: stimmt das?
+            gazePoint = (int) intent.getExtras().get(GAZEPOINTPOSITION);
+            Log.v(TAG, "gazePoint int onStartCommand: " + gazePoint);
+        } catch (Exception e) {
+            Log.v(TAG, "onStartCommand intent null");
+        }
+
+        if (capturingEvent.equals(String.valueOf(R.string.extra_capturingevent_normal)) || capturingEvent.equals(null)) {
             //Read and store current data-----------------------------------------------------------
             //picture name--------------------------------------------------------------------------
             try {
@@ -134,7 +143,7 @@ public class DataCollectionService extends Service implements LocationListener, 
             Log.v(TAG, "photoName" + photoName);
 
             //capture Event-------------------------------------------------------------------------
-            cv.put(Storage.COLUMN_CAPTUREEVENT, capturingEvent.toString());
+            cv.put(Storage.COLUMN_CAPTUREEVENT, capturingEvent);
             Log.v(TAG, "captureEvent: " + capturingEvent);
 
             //foreground App------------------------------------------------------------------------
@@ -228,6 +237,11 @@ public class DataCollectionService extends Service implements LocationListener, 
 
             cv.put(Storage.COLUMN_BATTERYLEVEL, batteryLevel);
             Log.v(TAG, "batteryLevel: " + batteryLevel);
+
+            //gazepoint----------------------------------------------------------------
+            cv.put(Storage.COLUMN_GAZEPOINT, gazePoint);
+            Log.v(TAG, "gaze Point: " + gazePoint);
+
         } else {//read general sensor information and store to db---------------------------------------
             try {
                 photoName = (String) intent.getExtras().get(PICTURENAME);
@@ -236,7 +250,7 @@ public class DataCollectionService extends Service implements LocationListener, 
             cv.put(Storage.COLUMN_PHOTO, photoName);
             Log.v(TAG, "photoName" + photoName);
 
-            cv.put(Storage.COLUMN_CAPTUREEVENT, capturingEvent.toString());
+            cv.put(Storage.COLUMN_CAPTUREEVENT, capturingEvent);
             Log.v(TAG, "captureEvent: " + capturingEvent);
 
             cv.put(Storage.COLUMN_FOREGROUNDAPP, foregroundApp);
@@ -317,6 +331,10 @@ public class DataCollectionService extends Service implements LocationListener, 
 
             cv.put(Storage.COLUMN_BATTERYLEVEL, batteryLevel);
             Log.v(TAG, "batteryLevel: " + batteryLevel);
+
+            //gazepoint----------------------------------------------------------------
+            cv.put(Storage.COLUMN_GAZEPOINT, gazePoint);
+            Log.v(TAG, "gaze Point: " + gazePoint);
 
             Log.v(TAG, "VALUES " + cv.toString());
         }

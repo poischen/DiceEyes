@@ -6,35 +6,27 @@ it is realized as a foreground service so it won't be killed by Android and the 
 */
 
 import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.Service;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.util.Log;
 
-import java.util.Observer;
-
-import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
-//public class AlarmService extends Service implements Observer {
-public class AlarmService {
+//public class ControlleService extends Service implements Observer {
+public class ControlleService {
 
-    private static final String TAG = AlarmService.class.getSimpleName();
+    private static final String TAG = ControlleService.class.getSimpleName();
 
     private AlarmManager alarmManager;
     private AlarmReceiver alarmReceiver;
     public static Storage storage;
     private String storagePath;
 
-    public AlarmService() {
+    public ControlleService() {
         super();
     }
 
   /*  @Override
     public void onCreate() {
         super.onCreate();
-        Log.v(TAG, "AlarmService created.");
+        Log.v(TAG, "ControlleService created.");
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
     }
 

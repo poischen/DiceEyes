@@ -43,20 +43,13 @@ public class Storage extends SQLiteOpenHelper {
     public static final String COLUMN_LIGHT = "light";
     public static final String COLUMN_BRIGHTNESS = "screenLightness";
     public static final String COLUMN_ORIENTATION = "orientation";
-    //public static final String COLUMN_PROXIMITY = "proximity";
     public static final String COLUMN_BATTERYSTATUS = "batteryStatus";
     public static final String COLUMN_BATTERYLEVEL = "batteryLevel";
-    public static final String COLUMN_RIGHT = "rightEye";
-    public static final String COLUMN_RIGHTOPEN = "rightEyeOpen";
-    public static final String COLUMN_LEFT = "leftEye";
-    public static final String COLUMN_LEFTOPEN = "leftEyeOpen";
-    public static final String COLUMN_EULERY = "eulerY";
-    public static final String COLUMN_EULERZ = "eulerZ";
-    public static final String COLUMN_MOUTH = "Mouth";
     public static final String COLUMN_LOCATIONLATITUDE = "LocationLatitude";
     public static final String COLUMN_LOCATIONLONGITUDE = "LocationLongitude";
     public static final String COLUMN_LOCATIONROAD = "LocationRoad";
     public static final String COLUMN_LOCATIONPOSTALCODE = "LocationPLZ";
+    public static final String COLUMN_GAZEPOINT = "gazepoint";
 
     public static final String storage_user_pref = "Alias Storage";
     public static final String storage_user_name = "Alias";
@@ -86,16 +79,9 @@ public class Storage extends SQLiteOpenHelper {
                     COLUMN_LIGHT + " TEXT, " +
                     COLUMN_BRIGHTNESS + " INTEGER, " +
                     COLUMN_ORIENTATION + " TEXT, " +
-                    //COLUMN_PROXIMITY + " TEXT, " +
                     COLUMN_BATTERYSTATUS + " TEXT, " +
                     COLUMN_BATTERYLEVEL + " INTEGER, " +
-                    COLUMN_EULERY + " TEXT, " +
-                    COLUMN_EULERZ + " TEXT, " +
-                    COLUMN_LEFT + " TEXT, " +
-                    COLUMN_LEFTOPEN + " TEXT, " +
-                    COLUMN_RIGHT + " TEXT, " +
-                    COLUMN_RIGHTOPEN + " TEXT, " +
-                    COLUMN_MOUTH + " TEXT);";
+                    COLUMN_GAZEPOINT + " TEXT);";
 
 
 
@@ -200,10 +186,7 @@ public class Storage extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.v(TAG, "onUpgrade called");
         if (newVersion == 1){
-            db.execSQL("ALTER TABLE " + DB_TABLE + " ADD " + COLUMN_LEFTOPEN + " TEXT");
-            db.execSQL("ALTER TABLE " + DB_TABLE + " ADD " + COLUMN_RIGHTOPEN + " TEXT");
-            db.execSQL("ALTER TABLE " + DB_TABLE + " ADD " + COLUMN_EULERY + " TEXT");
-            db.execSQL("ALTER TABLE " + DB_TABLE + " ADD " + COLUMN_EULERZ + " TEXT");
+
         }
     }
 

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="acb.diceeyes.View.GazeGrid">
+    tools:context="acb.diceeyes.View.GazeGrid"
+    android:background="@android:color/white">
 
     <android.support.v7.widget.GridLayout
         android:id="@+id/fullscreen_content"
@@ -14,84 +15,103 @@
         app:rowCount="3"
         >
         <ImageView
-            android:id="@+id/ivtl"
+            android:id="@+id/iv0"
             app:layout_columnWeight="1"
-            app:layout_gravity="fill"
             app:layout_rowWeight="1"
+            app:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@android:color/white"
+            android:src="@drawable/invisiblepoint"
+            android:scaleType="centerInside"
             />
         <ImageView
-            android:id="@+id/ivtm"
+            android:id="@+id/iv1"
             app:layout_columnWeight="1"
-            app:layout_gravity="fill"
+            app:layout_gravity="center"
             app:layout_rowWeight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@android:color/white" />
+            android:src="@drawable/invisiblepoint"
+            android:scaleType="centerInside"
+            />
         <ImageView
-            android:id="@+id/ivtr"
-            app:layout_columnWeight="1"
-            app:layout_gravity="fill"
-            app:layout_rowWeight="1"
+            android:id="@+id/iv2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@android:color/white" />
-        <ImageView
-            android:id="@+id/ivml"
+            android:scaleType="centerInside"
+            android:src="@drawable/invisiblepoint"
             app:layout_columnWeight="1"
-            app:layout_gravity="fill"
-            app:layout_rowWeight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:color/white" />
-        <ImageView
-            android:id="@+id/ivmm"
-            app:layout_columnWeight="1"
-            app:layout_gravity="fill"
-            app:layout_rowWeight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:color/white" />
-        <ImageView
-            android:id="@+id/ivmr"
-            app:layout_columnWeight="1"
-            app:layout_gravity="fill"
-            app:layout_rowWeight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:color/white" />
-        <ImageView
-            android:id="@+id/ivbl"
-            app:layout_columnWeight="1"
-            app:layout_gravity="fill"
-            app:layout_rowWeight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:color/white" />
-        <ImageView
-            android:id="@+id/ivbm"
-            app:layout_columnWeight="1"
-            app:layout_gravity="fill"
-            app:layout_rowWeight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:color/white" />
-        <ImageView
-            android:id="@+id/ivbr"
-            app:layout_columnWeight="1"
-            app:layout_gravity="fill"
-            app:layout_rowWeight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:color/white" />
+            app:layout_gravity="center"
+            app:layout_rowWeight="1" />
 
+        <ImageView
+            android:id="@+id/iv3"
+            app:layout_columnWeight="1"
+            app:layout_gravity="center"
+            app:layout_rowWeight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/invisiblepoint"
+            android:scaleType="centerInside"
+            />
+        <ImageView
+            android:id="@+id/iv4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_gravity="center"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"
+            android:src="@drawable/invisiblepoint"
+            android:scaleType="centerInside"
+            />
+        <ImageView
+            android:id="@+id/iv5"
+            app:layout_columnWeight="1"
+            app:layout_gravity="center"
+            app:layout_rowWeight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/invisiblepoint"
+            android:scaleType="centerInside"
+            />
+        <ImageView
+            android:id="@+id/iv6"
+            app:layout_columnWeight="1"
+            app:layout_gravity="center"
+            app:layout_rowWeight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            android:src="@drawable/invisiblepoint"
+            android:adjustViewBounds="true"
+            />
+        <ImageView
+            android:id="@+id/iv7"
+            app:layout_columnWeight="1"
+            app:layout_gravity="center"
+            app:layout_rowWeight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/invisiblepoint"
+            android:scaleType="centerInside"
+            />
+        <ImageView
+            android:id="@+id/iv8"
+            app:layout_columnWeight="1"
+            app:layout_gravity="center"
+            app:layout_rowWeight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/invisiblepoint"
+            android:scaleType="centerInside"
+            />
     </android.support.v7.widget.GridLayout>
 
     <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/gestureDetectorView" />
+        android:id="@+id/gestureDetectorView"
+        android:layout_width="wrap_content"
+        android:layout_height="567dp" />
+
+
 
 </FrameLayout>
