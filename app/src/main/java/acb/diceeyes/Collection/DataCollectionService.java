@@ -52,7 +52,7 @@ public class DataCollectionService extends Service implements LocationListener, 
     String accelerometerSensor = NASTRING;
     String gyroscopeSensor = NASTRING;
     String lightSensor = NASTRING;
-    String orientationSensor = NASTRING;
+    String rotationVectorSensor = NASTRING;
     String photoName = NASTRING;
     String foregroundApp = NASTRING;
     int locationLatitude = NAINT;
@@ -97,6 +97,7 @@ public class DataCollectionService extends Service implements LocationListener, 
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_FASTEST);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
     }
 
@@ -208,14 +209,8 @@ public class DataCollectionService extends Service implements LocationListener, 
             Log.v(TAG, "screen brightness: " + screenBrightness);
 
             //orientation---------------------------------------------------------------------------
-            //TODO
-            try {
-                orientation = (String) intent.getExtras().get(ORIENTATION);
-            } catch (NullPointerException e) {
-
-            }
             cv.put(Storage.COLUMN_ORIENTATION, orientation);
-            Log.v(TAG, "orientation Sensor:" + orientation);
+            Log.v(TAG, "orientation: " + orientation);
 
             //battery level & status----------------------------------------------------------------
             if (Build.VERSION.SDK_INT >= 23) {
@@ -308,13 +303,14 @@ public class DataCollectionService extends Service implements LocationListener, 
             cv.put(Storage.COLUMN_BRIGHTNESS, screenBrightness);
             Log.v(TAG, "screenBrightness: " + screenBrightness);
 
+
             try {
-                orientationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION).toString();
+                rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).toString();
             } catch (Exception e) {
-                Log.d(TAG, "no orientationSensor found");
+                Log.d(TAG, "no rotationVectorSensor found");
             }
-            cv.put(Storage.COLUMN_ORIENTATION, orientationSensor);
-            Log.v(TAG, "orientation Sensor:" + orientationSensor);
+            cv.put(Storage.COLUMN_ORIENTATION, rotationVectorSensor);
+            Log.v(TAG, "orientation Sensor:" + rotationVectorSensor);
 
             cv.put(Storage.COLUMN_BATTERYSTATUS, batteryStatus);
             Log.v(TAG, "batteryStatus: " + batteryStatus);
@@ -367,11 +363,34 @@ public class DataCollectionService extends Service implements LocationListener, 
                 gyroscopeY = String.valueOf(event.values[1]);
                 gyroscopeZ = String.valueOf(event.values[2]);
                 break;
-            case (Sensor.TYPE_ORIENTATION):
-                gyroscopeX = String.valueOf(event.values[0]);
-                gyroscopeY = String.valueOf(event.values[1]);
-                gyroscopeZ = String.valueOf(event.values[2]);
+            case (Sensor.TYPE_ROTATION_VECTOR):
+                if (event.values.length > 4) {
+                    float[] truncatedRotationVector = new float[4];
+                    System.arraycopy(event.values, 0, truncatedRotationVector, 0, 4);
+                    updateRotation(truncatedRotationVector);
+                } else {
+                    updateRotation(event.values);
+                }
                 break;
+        }
+    }
+
+
+    private void updateRotation(float[] vectors) {
+        float[] rotationMatrix = new float[9];
+        SensorManager.getRotationMatrixFromVector(rotationMatrix, vectors);
+        int worldAxisX = SensorManager.AXIS_X;
+        int worldAxisZ = SensorManager.AXIS_Z;
+        float[] adjustedRotationMatrix = new float[9];
+        SensorManager.remapCoordinateSystem(rotationMatrix, worldAxisX, worldAxisZ, adjustedRotationMatrix);
+        float[] orientation = new float[3];
+        SensorManager.getOrientation(adjustedRotationMatrix, orientation);
+        float roll = (float) Math.toDegrees(orientation[2]);
+
+        if(roll >= -75 && roll <= 75){
+            this.orientation = PORTAIT;
+        }else{
+            this.orientation = LANDSCAPE;
         }
     }
 
@@ -379,7 +398,6 @@ public class DataCollectionService extends Service implements LocationListener, 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
-
 
     @Override
     public void onLocationChanged(Location location) {
