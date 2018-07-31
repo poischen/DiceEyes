@@ -6,33 +6,44 @@ it is realized as a foreground service so it won't be killed by Android and the 
 */
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.util.Log;
 
+import java.util.Calendar;
+import java.util.Observer;
+
+import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
-//public class ControlleService extends Service implements Observer {
-public class ControlleService {
+public class ControlService extends Service implements Observer {
 
-    private static final String TAG = ControlleService.class.getSimpleName();
+    private static final String TAG = ControlService.class.getSimpleName();
 
     private AlarmManager alarmManager;
     private AlarmReceiver alarmReceiver;
     public static Storage storage;
     private String storagePath;
 
-    public ControlleService() {
+    public ControlService() {
         super();
     }
 
-  /*  @Override
+   @Override
     public void onCreate() {
         super.onCreate();
-        Log.v(TAG, "ControlleService created.");
+        Log.v(TAG, "ControlService created.");
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //Starting the Shooting after inizialising the user name in order to test if everything works
+        //TODO: start service mit init
+        //Starting the Shooting after inizialising the user name in order to test if everything works correctly
             //Bundle extras = intent.getExtras();
             storage = new Storage(getApplicationContext());
             storagePath = storage.getStoragePath();
@@ -47,28 +58,27 @@ public class ControlleService {
                     .build();
             startForeground(getResources().getInteger(R.integer.notification_id_service_running), notification);
 
-            IntentFilter alarmFilter = new IntentFilter("com.example.anita.diceeyes.AlarmReceiver");
-            alarmReceiver = new AlarmReceiver();
-            registerReceiver(alarmReceiver, alarmFilter);
-
         return START_STICKY;
     }
-*/
-    //TODO: Überarbeiten nach neuer Logik
+
     /*
-   sets 6 random daily alarms between 10 am and 22 pm, where pictures should be taken
-   sets a daily alarm to remind transfering data
+   sets 20 random daily alarms between start and end time for taking photos (4 for each gaze point)
+   sets a daily alarm to remind transferring data
     */
     private void setRandomPictureAndDatatransferAlarms() {
 
         /*
-        set random alarms
-        version 1 - most user did not receive enough surveys
-        version 2 - every time the sceen is switched on, it will be checked if a survey has already taken place in the current intervall
+        set random alarms:
+        Every time the screen is switched on, it will be checked if a photo has already been taken in the current period of 30 minutes;
+        If not a alarm will be set randomly between 1-15 seconds;
+        Every taken picture increases a persistently stored counter;
+        Every time the screen is switched on, it will be checked if there are missing shots of a period via the counter and additional random but unique alarms between 1-15 seconds will be set;
+        If the screen is switched off all alarms will be canceled
          */
-        /*IntentFilter filter = new IntentFilter("com.example.anita.hdyhyp.RandomAlarmReceiver");
-        randomAlarmReceiver = new RandomAlarmReceiver();
-        registerReceiver(randomAlarmReceiver, filter);
+
+        IntentFilter filter = new IntentFilter("acb.diceeyes.AlarmControll.AlarmReceiver");
+        alarmReceiver = new AlarmReceiver();
+        registerReceiver(alarmReceiver, filter);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         //calculate and set random alarms
@@ -96,7 +106,7 @@ public class ControlleService {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), i, intent, PendingIntent.FLAG_CANCEL_CURRENT);
             randomPendingIntentArray.add(pendingIntent);
             alarmManager.setRepeating(AlarmManager.RTC, c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-        }*/
+        }
 
         //TODO: AB heir überarbeiten
 /*        //set data transfer alarm

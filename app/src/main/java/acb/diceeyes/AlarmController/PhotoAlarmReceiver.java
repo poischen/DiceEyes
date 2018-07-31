@@ -1,4 +1,4 @@
-package acb.diceeyes.AlarmControll;
+package acb.diceeyes.AlarmController;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,9 +7,7 @@ import android.content.Intent;
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
-import static android.content.Context.ALARM_SERVICE;
-import static android.content.Context.POWER_SERVICE;
-
+//TODO: ANPASSEN!
 public class AlarmReceiver extends BroadcastReceiver {
     private boolean[] wasRescheduled = new boolean[6];
     private long[] startTime = new long[6];
