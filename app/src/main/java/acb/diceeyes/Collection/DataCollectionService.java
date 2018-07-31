@@ -17,7 +17,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.nfc.Tag;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,7 +29,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import acb.diceeyes.AlarmControll.ControlleService;
+import acb.diceeyes.AlarmController.ControllerService;
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
@@ -42,7 +41,6 @@ public class DataCollectionService extends Service implements LocationListener, 
 
     public static final String NASTRING = "n./a.";
     public static final int NAINT = -11;
-    public static final String FOREGROUNDAPP = "foregroundApp";
     public static final String PICTURENAME = "pictureName";
     public static final String PORTAIT = "portrait";
     public static final String LANDSCAPE = "landscape";
@@ -53,7 +51,6 @@ public class DataCollectionService extends Service implements LocationListener, 
     String lightSensor = NASTRING;
     String rotationVectorSensor = NASTRING;
     String photoName = NASTRING;
-    String foregroundApp = NASTRING;
     int locationLatitude = NAINT;
     int locationLongitude = NAINT;
     String locationRoad = NASTRING;
@@ -71,7 +68,7 @@ public class DataCollectionService extends Service implements LocationListener, 
     int batteryLevel = NAINT;
     int gazePoint = NAINT;
     private SQLiteDatabase database;
-    private Storage storage = ControlleService.storage;
+    private Storage storage = ControllerService.storage;
     private SensorManager sensorManager;
     private LocationManager locationManager;
     private Location latestLocation;
@@ -145,14 +142,6 @@ public class DataCollectionService extends Service implements LocationListener, 
             //capture Event-------------------------------------------------------------------------
             cv.put(Storage.COLUMN_CAPTUREEVENT, capturingEvent);
             Log.v(TAG, "captureEvent: " + capturingEvent);
-
-            //foreground App------------------------------------------------------------------------
-            try {
-                foregroundApp = (String) intent.getExtras().get(FOREGROUNDAPP);
-            } catch (NullPointerException e) {
-            }
-            cv.put(Storage.COLUMN_FOREGROUNDAPP, foregroundApp);
-            Log.v(TAG, "foregroundApp: " + foregroundApp);
 
             //location------------------------------------------------------------------------------
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -253,9 +242,6 @@ public class DataCollectionService extends Service implements LocationListener, 
             cv.put(Storage.COLUMN_CAPTUREEVENT, capturingEvent);
             Log.v(TAG, "captureEvent: " + capturingEvent);
 
-            cv.put(Storage.COLUMN_FOREGROUNDAPP, foregroundApp);
-            Log.v(TAG, "foregroundApp: " + foregroundApp);
-
             cv.put(Storage.COLUMN_LOCATIONLATITUDE, locationLatitude);
             cv.put(Storage.COLUMN_LOCATIONLONGITUDE, locationLongitude);
             cv.put(Storage.COLUMN_LOCATIONROAD, locationRoad);
@@ -347,9 +333,8 @@ public class DataCollectionService extends Service implements LocationListener, 
         database.close();
 
         //reset values not depending from sensor listener
-        photoName = foregroundApp = locationRoad = locationPLZ = orientation = batteryStatus = NASTRING;
+        photoName = locationRoad = locationPLZ = orientation = batteryStatus = NASTRING;
         locationLatitude = locationLongitude = screenBrightness = NAINT;
-
 
         return START_STICKY;
     }

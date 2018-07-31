@@ -59,7 +59,7 @@ public class GazeGrid extends AppCompatActivity {
             case 8: imageView = findViewById(R.id.iv8); break;
             default: imageView = findViewById(R.id.iv0);
         }
-        imageView.setImageResource(R.drawable.point);
+        imageView.setVisibility(View.VISIBLE);
     }
 
     private void startCapturePhotoService() {
@@ -72,7 +72,6 @@ public class GazeGrid extends AppCompatActivity {
 
         //ask if the user really looked at the point
         showConfirmation();
-
     }
 
     public void showConfirmation(){
@@ -84,13 +83,14 @@ public class GazeGrid extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(GazeGrid.this, R.string.gazegrid_toast_ok, Toast.LENGTH_SHORT).show();
+                //TODO: mark as valid in db
                 finish();
             }
         });
         builder.setNegativeButton(R.string.gazegrid_alertdialog_buttonredo, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //TODO: delete picture & mark as not usable
+                //TODO: mark as non valid in db
             }
         });
         AlertDialog dialog = builder.create();

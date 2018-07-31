@@ -21,7 +21,8 @@
             app:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/invisiblepoint"
+            android:src="@drawable/point"
+            android:visibility="invisible"
             android:scaleType="centerInside"
             />
         <ImageView
@@ -31,7 +32,8 @@
             app:layout_rowWeight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/invisiblepoint"
+            android:src="@drawable/point"
+            android:visibility="invisible"
             android:scaleType="centerInside"
             />
         <ImageView
@@ -39,9 +41,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleType="centerInside"
-            android:src="@drawable/invisiblepoint"
+            android:src="@drawable/point"
             app:layout_columnWeight="1"
             app:layout_gravity="center"
+            android:visibility="invisible"
             app:layout_rowWeight="1" />
 
         <ImageView
@@ -51,7 +54,8 @@
             app:layout_rowWeight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/invisiblepoint"
+            android:src="@drawable/point"
+            android:visibility="invisible"
             android:scaleType="centerInside"
             />
         <ImageView
@@ -61,7 +65,8 @@
             app:layout_gravity="center"
             app:layout_columnWeight="1"
             app:layout_rowWeight="1"
-            android:src="@drawable/invisiblepoint"
+            android:src="@drawable/point"
+            android:visibility="invisible"
             android:scaleType="centerInside"
             />
         <ImageView
@@ -71,7 +76,8 @@
             app:layout_rowWeight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/invisiblepoint"
+            android:src="@drawable/point"
+            android:visibility="invisible"
             android:scaleType="centerInside"
             />
         <ImageView
@@ -82,7 +88,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleType="centerInside"
-            android:src="@drawable/invisiblepoint"
+            android:src="@drawable/point"
+            android:visibility="invisible"
             android:adjustViewBounds="true"
             />
         <ImageView
@@ -92,7 +99,8 @@
             app:layout_rowWeight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/invisiblepoint"
+            android:src="@drawable/point"
+            android:visibility="invisible"
             android:scaleType="centerInside"
             />
         <ImageView
@@ -102,7 +110,8 @@
             app:layout_rowWeight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/invisiblepoint"
+            android:src="@drawable/point"
+            android:visibility="invisible"
             android:scaleType="centerInside"
             />
     </android.support.v7.widget.GridLayout>

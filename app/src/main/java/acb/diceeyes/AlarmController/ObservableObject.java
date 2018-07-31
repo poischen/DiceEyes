@@ -1,7 +1,4 @@
-package acb.diceeyes.AlarmControll;
-
-import android.app.PendingIntent;
-import android.util.Log;
+package acb.diceeyes.AlarmController;
 
 import java.util.Observable;
 

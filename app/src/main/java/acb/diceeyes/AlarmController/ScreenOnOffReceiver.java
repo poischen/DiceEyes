@@ -9,8 +9,8 @@ import android.util.Log;
  * Created by anita_000 on 31.07.2018.
  */
 
-public class EventBroadcastReceiver extends BroadcastReceiver {
-    private static final String TAG = EventBroadcastReceiver.class.getSimpleName();
+public class ScreenOnOffReceiver extends BroadcastReceiver {
+    private static final String TAG = ScreenOnOffReceiver.class.getSimpleName();
     @Override
     public void onReceive(Context context, Intent intent) {
         switch (intent.getAction()){

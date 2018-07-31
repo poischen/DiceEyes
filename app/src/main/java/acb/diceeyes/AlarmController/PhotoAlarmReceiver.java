@@ -8,16 +8,16 @@ import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
 //TODO: ANPASSEN!
-public class AlarmReceiver extends BroadcastReceiver {
+public class PhotoAlarmReceiver extends BroadcastReceiver {
     private boolean[] wasRescheduled = new boolean[6];
     private long[] startTime = new long[6];
     private int[] rescheduleCounter = new int[] {0, 0, 0, 0, 0, 0};
     private int shiftMillisScreenOff = 20000;
     private int shiftMillisPicIsCurrentlyTaken = 5000;
 
-    private static final String TAG = AlarmReceiver.class.getSimpleName();
+    private static final String TAG = PhotoAlarmReceiver.class.getSimpleName();
 
-    public AlarmReceiver() {
+    public PhotoAlarmReceiver() {
     }
 
     @Override
@@ -26,7 +26,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Storage storage = new Storage(context);
 
-        boolean wasAlreadyTaken = storage.getRandomWasTakenInCurrentPeriod(requestID);
+        boolean wasAlreadyTaken = storage.getPhotoWasTakenInCurrentPeriod(requestID);
         if (!wasAlreadyTaken){
             ObservableObject.getInstance().setReminderPeriod(requestID);
             ObservableObject.getInstance().updateValue(intent);

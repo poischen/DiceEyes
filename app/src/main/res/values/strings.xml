@@ -33,6 +33,7 @@
     <!-- Notifications -->
     <string name="notifications_title">Dice Eyes</string>
     <string name="notifications_generic">Service is running. Thanks for participating :)</string>
+    <string name="notifications_datatransfer">Please transfer data if possible</string>
 
     <!-- Intent communication -->
     <string name="extra_requestid">requestID</string>
@@ -40,10 +41,30 @@
     <string name="extra_capturingevent_init">init</string>
     <string name="extra_capturingevent_normal">normal</string>
 
+    <!-- Alarm Periods -->
+    <integer name="alarm_period_1">10</integer>
+    <integer name="alarm_period_2">105</integer>
+    <integer name="alarm_period_3">11</integer>
+    <integer name="alarm_period_4">115</integer>
+    <integer name="alarm_period_5">12</integer>
+    <integer name="alarm_period_6">125</integer>
+    <integer name="alarm_period_7">13</integer>
+    <integer name="alarm_period_8">135</integer>
+    <integer name="alarm_period_9">14</integer>
+    <integer name="alarm_period_10">145</integer>
+    <integer name="alarm_period_11">16</integer>
+    <integer name="alarm_period_12">165</integer>
+    <integer name="alarm_period_13">17</integer>
+    <integer name="alarm_period_14">175</integer>
+    <integer name="alarm_period_15">18</integer>
+    <integer name="alarm_period_16">185</integer>
+    <integer name="alarm_period_17">19</integer>
+    <integer name="alarm_period_18">195</integer>
+    <integer name="alarm_period_19">20</integer>
+    <integer name="alarm_period_20">205</integer>
+
     <!-- Settings -->
     <string name="settings_name">Study alias</string>
-    <string name="settings_time_start">Start daily</string>
-    <string name="settings_time_end">End daily</string>
     <string name="settings_permissions">Permissions</string>
     <string name="settings_name_hl">Choose your study alias:</string>
     <string-array name="settings_name_spinnerentries">
@@ -69,5 +90,6 @@
         <item>Sul</item>
         <item>Tanqueray</item>
     </string-array>
+    <string name="title_activity_photo_review_transfer">PhotoReviewTransferActivity</string>
 
 </resources>

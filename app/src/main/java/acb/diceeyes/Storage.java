@@ -55,10 +55,6 @@ public class Storage extends SQLiteOpenHelper {
     public static final String storage_user_name = "Alias";
     public static final String storage_user_index = "Alias Index";
     public static final String storage_alarm_pref = "Alarm Storage";
-    public static final String storage_alarmStartStop_pref = "Start Stop Storage";
-    public static final String storage_alarmStart_index = "Start Index";
-    public static final String storage_alarmStop_index = "Stop Index";
-
 
     public static final String SQL_CREATEDATA =
             "CREATE TABLE " + DB_TABLE +
@@ -91,11 +87,8 @@ public class Storage extends SQLiteOpenHelper {
     private SharedPreferences userAliasStorage;
     private SharedPreferences.Editor userAliasEditor;
 
-    private SharedPreferences ranomAlarmsStorage;
-    private SharedPreferences.Editor ranomAlarmsEditor;
-
-    private SharedPreferences alarmStartStopStorage;
-    private SharedPreferences.Editor alarmStartStopEditor;
+    private SharedPreferences photoAlarmsStorage;
+    private SharedPreferences.Editor photoAlarmsEditor;
 
     public Storage(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -105,11 +98,8 @@ public class Storage extends SQLiteOpenHelper {
         userAliasStorage = context.getSharedPreferences(storage_user_pref, 0);
         userAliasEditor = userAliasStorage.edit();
 
-        ranomAlarmsStorage = context.getSharedPreferences(storage_alarm_pref, 0);
-        ranomAlarmsEditor = ranomAlarmsStorage.edit();
-
-        alarmStartStopStorage = context.getSharedPreferences(storage_alarmStartStop_pref, 0);
-        alarmStartStopEditor = alarmStartStopStorage.edit();
+        photoAlarmsStorage = context.getSharedPreferences(storage_alarm_pref, 0);
+        photoAlarmsEditor = photoAlarmsStorage.edit();
     }
 
     public String getAlias(){
@@ -125,7 +115,7 @@ public class Storage extends SQLiteOpenHelper {
             userAliasEditor.putString(storage_user_name, input);
             userAliasEditor.putInt(storage_user_index, index);
             userAliasEditor.commit();
-            Log.d(TAG, "Alias stored: " + input);
+            Log.v(TAG, "Alias stored: " + input);
         } catch (Exception e){
         }
     }
@@ -135,27 +125,47 @@ public class Storage extends SQLiteOpenHelper {
         userAliasEditor.commit();
     }
 
-    public void setRandomWasTakenInCurrentPeriod(int period, boolean wasTaken){
+    public void setPhotoWasTakenInCurrentPeriod(int period, boolean wasTaken){
         String p = period + "";
-        ranomAlarmsEditor.putBoolean(p, wasTaken);
-        ranomAlarmsEditor.commit();
+        photoAlarmsEditor.putBoolean(p, wasTaken);
+        int counterValue = photoAlarmsStorage.getInt("counter", 0);
+        Log.v(TAG, "counter value: " + counterValue);
+        photoAlarmsEditor.putInt("counter", (counterValue+1));
+        photoAlarmsEditor.commit();
     }
 
-    public boolean getRandomWasTakenInCurrentPeriod(int period) {
+    public boolean getPhotoWasTakenInCurrentPeriod(int period) {
         String p = period + "";
-        boolean getRandomWasTakenInCurrentPeriod = ranomAlarmsStorage.getBoolean(p, false);
-        return getRandomWasTakenInCurrentPeriod;
+        boolean getPhotoWasTakenInCurrentPeriod = photoAlarmsStorage.getBoolean(p, false);
+        return getPhotoWasTakenInCurrentPeriod;
     }
 
-    public void setAllRandomWasTakenInCurrentPeriod(boolean wasTaken){
-        ranomAlarmsEditor.putBoolean("10", wasTaken);
-        ranomAlarmsEditor.putBoolean("12", wasTaken);
-        ranomAlarmsEditor.putBoolean("14", wasTaken);
-        ranomAlarmsEditor.putBoolean("16", wasTaken);
-        ranomAlarmsEditor.putBoolean("18", wasTaken);
-        ranomAlarmsEditor.putBoolean("20", wasTaken);
-        ranomAlarmsEditor.commit();
+    //TODO: -1 checken/bedenken
+    public int getMissedPeriods(int period){
+        int countedPeriods = photoAlarmsStorage.getInt("counter", 0);
+        int missedPeriods = 0;
+        if (countedPeriods < (period - 1)){
+            missedPeriods = period - 1 - countedPeriods;
+        }
+        return missedPeriods;
     }
+
+   /* public void setAllPhotosWereTakenInCurrentPeriod(boolean wasTaken){
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
+
+        photoAlarmsEditor.commit();
+    }*/
 
     public String getStoragePath(){
         return STORAGEPATHIMG;

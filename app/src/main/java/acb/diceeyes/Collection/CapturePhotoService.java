@@ -190,7 +190,7 @@ public class CapturePhotoService extends Service {
             } catch (Exception e){
                 Log.v(TAG, "Camera could not be released: " + e);
             }
-            startDataCollectionService( "foregroundApp TODO!");
+            startDataCollectionService();
             camera = null;
         }
 
@@ -207,9 +207,8 @@ public class CapturePhotoService extends Service {
 
     }
 
-    public void startDataCollectionService(String foregroundApp) {
+    public void startDataCollectionService() {
         Intent dataCollectionIntent = new Intent(getApplicationContext(), DataCollectionService.class);
-            dataCollectionIntent.putExtra(DataCollectionService.FOREGROUNDAPP, foregroundApp);
             dataCollectionIntent.putExtra(DataCollectionService.PICTURENAME, photoName);
             dataCollectionIntent.putExtra(String.valueOf(R.string.extra_capturingevent), event);
         getApplicationContext().startService(dataCollectionIntent);

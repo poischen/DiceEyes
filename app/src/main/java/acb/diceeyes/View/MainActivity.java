@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import acb.diceeyes.AlarmControll.ControlleService;
+import acb.diceeyes.AlarmController.ControllerService;
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
 
     /*Starts a longlasting Service which controlls and triggers the gaze grid */
     private void startAlarmService(){
-        Intent controllerIntent = new Intent(this, ControlleService.class);
+        Intent controllerIntent = new Intent(this, ControllerService.class);
         getApplicationContext().startService(controllerIntent);
     }
 
