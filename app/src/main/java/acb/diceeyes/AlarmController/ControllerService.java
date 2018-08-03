@@ -11,9 +11,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Observable;
 import java.util.Observer;
@@ -22,6 +24,7 @@ import acb.diceeyes.Collection.CapturePhotoService;
 import acb.diceeyes.Collection.DataCollectionService;
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
+import acb.diceeyes.View.GazeGrid;
 
 public class ControllerService extends Service implements Observer {
 
@@ -37,6 +40,9 @@ public class ControllerService extends Service implements Observer {
     private ScreenOnOffReceiver systemEventReceiver;
     private TransferReminderAlarmReceiver transferReminderAlarmReceiver;
     private PhotoAlarmReceiver photoAlarmReceiver;
+
+    private ArrayList<PendingIntent> pendingIntentArray = new ArrayList<PendingIntent>();
+    private int requestIdCounter = 3;
 
     public ControllerService() {
         super();
@@ -56,7 +62,6 @@ public class ControllerService extends Service implements Observer {
             capturingEvent = String.valueOf(R.string.extra_capturingevent_init);
             startCapturePictureService();
             capturingEvent = String.valueOf(R.string.extra_capturingevent_normal);
-            //TODO werden die benötig? dann als Feld
             String storagePath = storage.getStoragePath();
             String userAlias = storage.getAlias();
             firstTrySuccessfullyFlag = true;
@@ -72,13 +77,9 @@ public class ControllerService extends Service implements Observer {
 
             //Register Broadcast Receiver for listening if the screen is on/off & if system was rebooted
             systemEventReceiver = new ScreenOnOffReceiver();
-            final IntentFilter onOffFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+            IntentFilter onOffFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
             onOffFilter.addAction(Intent.ACTION_SCREEN_OFF);
             registerReceiver(systemEventReceiver, onOffFilter);
-
-            IntentFilter eventFilter = new IntentFilter("acb.diceeyes.AlarmControll.ScreenOnOffReceiver");
-            systemEventReceiver = new ScreenOnOffReceiver();
-            registerReceiver(systemEventReceiver, eventFilter);
 
             // Notification about starting the controller service foreground according to the design guidelines
             Notification notification = new Notification.Builder(getApplicationContext())
@@ -105,7 +106,7 @@ public class ControllerService extends Service implements Observer {
         Every time the screen is switched on, it will be checked if a photo has already been taken in the current period (30 minutes, 20 periods);
         If not a alarm will be set randomly between 1-15 seconds;
         Every taken picture increases a persistently stored counter;
-        Every time the screen is switched on, it will be checked if there are missing shots of a period via the counter and additional random but unique alarms between 1-15 seconds will be set;
+        Every time the screen is switched on and it is not necessary to capture a photo in this perios, it will be checked if there are missing shots of a period via the counter and additional random alarms between 1-15 seconds will be set;
         If the screen is switched off all alarms will be canceled (cancelFutureAlarms())
          */
         IntentFilter filter = new IntentFilter("acb.diceeyes.AlarmControll.PhotoAlarmReceiver");
@@ -182,9 +183,6 @@ public class ControllerService extends Service implements Observer {
         Log.v(TAG, "data transfer reminder canceled");
 
         isScreenActive = false;
-
-        //TODO: stop pending alarms for triggering photos
-
         //stop Controller Service
         stopSelf();
     }
@@ -199,176 +197,220 @@ public class ControllerService extends Service implements Observer {
         }
 
         Log.v(TAG, "update action: " + action);
-        if (!(action.equals("empty"))) {
-            if (action.contains("android.intent.action.SCREEN_OFF")) {
+         if (!(action.equals("empty"))) {
+             if (action.contains("android.intent.action.SCREEN_ON")) {
+                 isScreenActive = true;
+
+                 //check if in relevant time
+                 Calendar currentTime = Calendar.getInstance();
+                 currentTime.setTimeInMillis(System.currentTimeMillis());
+                 int hour = currentTime.get(Calendar.HOUR);
+
+                 if (hour > 7 && hour < 22){
+                     //check if it is necessary to take a picture in this period and set alarms if so
+                     int period = calculatePeriod();
+                     if (!wasAlreadyTakenInPeriod(period) && hour < 20){
+                         setGridAlarm(period);
+                     } else {
+                         //check if there were missed periods and set alarm
+                         int missedAlarms = checkMissedPeriods(calculatePeriod());
+                         if (missedAlarms > 0){
+                             setGridAlarm(0);
+                         }
+                     }
+                 } else {
+                     requestIdCounter = 3;
+                 }
+             }
+             else if (action.contains("android.intent.action.SCREEN_OFF")) {
                 Log.v(TAG, "screen was turned off, cancel future alarms");
                 isScreenActive = false;
                 handleScreenOff();
             }
-            //else if (action.contains("EventAlarmReceiver")) {
-              //  startCapturePictureService();
-                //Log.v(TAG, "event has not changed, capture pic again");
-            //remove pending intent from list
-            //ObservableObject.getInstance().getPendingIntentRequestID();
-
-//            int size = eventPendingIntentArray.size();
-  //          if ( size > 0) {
-    //            for (int i = 0; i < size; i++) {
-      //              if (eventPendingIntentArray.get(i).get)
-        //        }
-          //  }
-
-          //  }
             else if (action.contains("PhotoAlarmReceiver")) {
-                Log.v(TAG, "Alarm triggers capturing photo");
+                Log.v(TAG, "Photo Alarm triggers capturing photo");
                 if (isScreenActive) {
-                    if (startCapturePictureService()){
-                        int period = (ObservableObject.getInstance().getReminderPeriod());
-                        if (period > 0){
-                            storage.setPhotoWasTakenInCurrentPeriod(period, true);
-                            ObservableObject.getInstance().setReminderPeriod(0);
-                        }
-                    }
-
-                }
-            } else if (action.contains("android.intent.action.SCREEN_ON")) {
-                startDataCollectionService(DataCollectorService.DCSCOMMANDREGISTER, getApplicationContext(), null, null, null, null, null, null, null, null, null, null);
-                isScreenActive = true;
-
-                appDetectionThread = new Thread(runnableAppDetector);
-                appDetectionThread.start();
-
-                this.capturingEvent = CapturingEvent.SCREENON;
-                Log.v(TAG, "Event detected, capturingEvent set to: " + this.capturingEvent);
-                initPictureTakingSession(capturingEvent);
-
-                //see if a random picture with survey has to be taken in current period
-                isRandomAlreadyTaken();
-            } else if (action.contains("android.intent.action.CONFIGURATION_CHANGED")) {
-                if (ObservableObject.getInstance().isOrientationPortrait() != lastDetectedOrientationPortrait) {
-                    lastDetectedOrientationPortrait = ObservableObject.getInstance().isOrientationPortrait();
-                    this.capturingEvent = CapturingEvent.ORIENTATION;
-                    Log.v(TAG, "Event detected, capturingEvent set to: " + this.capturingEvent);
-                    initPictureTakingSession(capturingEvent);
+                    //start GazeGrid
+                    Intent intent = new Intent(this, GazeGrid.class);
+                    intent.putExtra(String.valueOf(R.string.extra_period), ObservableObject.getInstance().getPeriod());
+                    intent.putExtra(String.valueOf(GazeGrid.GAZEPOINTPOSITION), storage.getGazePoint());
+                    startActivity(intent);
                 }
             }
         }
-
     }
 
+    private boolean wasAlreadyTakenInPeriod(int period){
+        return storage.getPhotoWasTakenInCurrentPeriod(period);
+    }
 
-
-    private void handleScreenOff(){
-        cancelFutureAlarms();
-        startDataCollectionService(DataCollectorService.DCSCOMMANDUNREGISTER, getApplicationContext(), null, null, null, null, null, null, null, null, null, null);
-        this.capturingEvent = STOP;
-        try {
-            appDetectionThread.stop();
-        } catch (Exception e){
-            Log.v(TAG, "appDetectionThread not interrupted, is alive: " + appDetectionThread.isAlive());
+    private int checkMissedPeriods(int period){
+        int periodsSoll;
+        switch (period){
+            case 10:
+                periodsSoll = 1;
+                break;
+            case 105:
+                periodsSoll = 2;
+                break;
+            case 11:
+                periodsSoll = 3;
+                break;
+            case 115:
+                periodsSoll = 4;
+                break;
+            case 12:
+                periodsSoll = 5;
+                break;
+            case 125:
+                periodsSoll = 6;
+                break;
+            case 13:
+                periodsSoll = 7;
+                break;
+            case 135:
+                periodsSoll = 8;
+                break;
+            case 14:
+                periodsSoll = 9;
+                break;
+            case 145:
+                periodsSoll = 10;
+                break;
+            case 15:
+                periodsSoll = 11;
+                break;
+            case 155:
+                periodsSoll = 12;
+                break;
+            case 16:
+                periodsSoll = 13;
+                break;
+            case 165:
+                periodsSoll = 14;
+                break;
+            case 17:
+                periodsSoll = 15;
+                break;
+            case 175:
+                periodsSoll = 16;
+                break;
+            case 18:
+                periodsSoll = 17;
+                break;
+            case 185:
+                periodsSoll = 18;
+                break;
+            case 19:
+                periodsSoll = 19;
+                break;
+            case 195:
+                periodsSoll = 20;
+                break;
+            /*case 20:
+                periodsSoll = 20;
+                break;
+            case 205:
+                periodsSoll = 20;
+                break;
+            case 215:
+                periodsSoll = 20;
+                break;*/
+            default:
+                periodsSoll = 20;
         }
+        return storage.getMissedPeriods(periodsSoll);
     }
 
-    private void initPictureTakingSession(CapturingEvent capturingEvent) {
-        Log.v(TAG, "initPictureTakingSession() is called");
+    /*
+       set alarms for taking a photo in randomly 1-15 seconds
+     */
+    private void setGridAlarm(int period){
+        //tell datacollection service to register sensors
+        startDataCollectionService(DataCollectionService.COMMAND_REGISTER);
 
-        //try to take the first picture immediately
-        startCapturePictureService(capturingEvent);
+        //create Intent and store in case of need to cancel the alarm
+        Intent intent = new Intent(this, PhotoAlarmReceiver.class);
+        intent.setAction("acb.diceeyes.AlarmController.PhotoAlarmReceiver");
+        intent.putExtra(String.valueOf(R.string.extra_period), period);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), requestIdCounter, intent, PendingIntent.FLAG_ONE_SHOT);
+        requestIdCounter++;
+        pendingIntentArray.add(pendingIntent);
 
-        //check and cancel future taking picture alarms
-        cancelFutureAlarms();
+        //calculate random delay of 1-5 seconds
+        int randomSec = (int) Math.random() * 16;
+        int randomMilisec = (int) Math.random() * 1000;
 
-
-        //final int tIteration1 = 3500;
-        //final int tIteration2 = 12500;
-        //final int tIteration3 = 15000;
-        final int tIteration1 = 2;
-        final int tIteration2 = 15;
-        final int tIteration3 = 30;
-
-        //set alarms for taking pictures for the incoming event
-        long currentTimeMillis = System.currentTimeMillis();
-
-
-        int requestId = 80;
-
-        Log.v(TAG, "event in initPictureTakingSession() before setting alarms: "+ capturingEvent.toString());
-        //set one alarm for the events SCREENON, NOTIFICATION, APPLICATION & ORIENTATION
-        if (capturingEvent.equals(CapturingEvent.SCREENON) || capturingEvent.equals(CapturingEvent.NOTIFICATION) ||
-                capturingEvent.equals(CapturingEvent.APPLICATION) || capturingEvent.equals(CapturingEvent.ORIENTATION)){
-            Log.v(TAG, "set alarm.");
-            setEventAlarm(tIteration1, requestId, currentTimeMillis);
-            requestId++;
-
-            //set two more alarms for the event APPLICATION
-            if (capturingEvent.equals(CapturingEvent.APPLICATION)){
-                setEventAlarm(tIteration2, requestId, currentTimeMillis);
-                requestId++;
-                setEventAlarm(tIteration3, requestId, currentTimeMillis);
-                requestId++;
-            }
-            //calendar = null;
-        }
-    }
-
-
-    private void setEventAlarm(int iteration, int requestId, long currentTimeMillis){
-
-        //set alarms for taking pictures for the incoming event
-        Intent intent = new Intent(this, EventAlarmReceiver.class);
-        intent.putExtra(REQUESTID, requestId);
-        intent.setAction("com.example.anita.hdyhyp.EventAlarmReceiver");
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), requestId, intent, PendingIntent.FLAG_ONE_SHOT);
-        eventPendingIntentArray.add(pendingIntent);
-
-        //new Time
         Calendar currentTime = Calendar.getInstance();
-        currentTime.setTimeInMillis(currentTimeMillis);
+        currentTime.setTimeInMillis(System.currentTimeMillis());
         Calendar calendar = (Calendar) currentTime.clone();
-        calendar.set(Calendar.SECOND, calendar.get(Calendar.SECOND) + iteration);
+        calendar.set(Calendar.SECOND, calendar.get(Calendar.SECOND) + randomSec);
+        calendar.set(Calendar.MILLISECOND, calendar.get(Calendar.MILLISECOND) + randomMilisec);
 
-        //alarmManager.setExact(AlarmManager.RTC, (currentTimeMillis + (iteration)), pendingIntent);
+        //set alarm
         alarmManager.set(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent);
-        Log.v(TAG, "alarm set in " + iteration + " seconds.");
+        Log.v(TAG, "alarm set in " + randomSec + "," + randomMilisec + " seconds.");
+    }
+
+    public static int calculatePeriod() {
+        int period = 0;
+
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.setTimeInMillis(System.currentTimeMillis());
+        int hour = currentTime.get(Calendar.HOUR);
+        int minute = currentTime.get(Calendar.MINUTE);
+
+        int minuteRounded;
+        if (minute < 30){
+            period = hour;
+        } if (minute >= 30){
+            String periodString = hour + "5";
+            period = Integer.valueOf(periodString);
+        }
+        Log.v(TAG, "period: " + period);
+
+        return period;
     }
 
     private void cancelFutureAlarms(){
-        int randomSize = randomPendingIntentArray.size();
-        if ( randomSize > 0){
-            for (int i=0; i<randomSize; i++){
+        //TODO: loop necessary? theoretisch kann es nur ein pending intent sein
+        int pendingIntentSize = pendingIntentArray.size();
+        if ( pendingIntentSize > 0){
+            for (int i=0; i<pendingIntentSize; i++){
                 try {
-                    alarmManager.cancel(randomPendingIntentArray.get(i));
+                    alarmManager.cancel(pendingIntentArray.get(i));
                 } catch (Exception e){
-                    Log.d(TAG, "Random alarm was not found in Array");
+                    Log.d(TAG, "alarm was not found in Array");
                 }
             }
-            randomPendingIntentArray.clear();
-            currentRandomPendingIntent = null;
-        }
-
-
-        int eventSize = eventPendingIntentArray.size();
-        if ( eventSize > 0){
-            for (int i=0; i<eventSize; i++){
-                try {
-                    alarmManager.cancel(eventPendingIntentArray.get(i));
-                } catch (Exception e){
-                    Log.d(TAG, "Event alarm was not found in Array");
-                }
-            }
-            eventPendingIntentArray.clear();
+            pendingIntentArray.clear();
         }
     }
 
     private boolean startCapturePictureService() {
-        //start taking the picture
-        // the CapurePicService will run the DataCollection when it is finished taking the pic
-
         Intent capturePicServiceIntent = new Intent(this, CapturePhotoService.class);
         capturePicServiceIntent.putExtra(String.valueOf(R.string.extra_capturingevent), capturingEvent);
         getApplicationContext().startService(capturePicServiceIntent);
         Log.v(TAG, "CapturePicService will be started now");
         return true;
-
 }
+
+    private void handleScreenOff(){
+        cancelFutureAlarms();
+        startDataCollectionService(DataCollectionService.COMMAND_UNREGISTER);
+    }
+
+    /*
+    trigger onStartCommand inDataCollectionService in order to register/unregister listeners
+     */
+    public void startDataCollectionService(String command) {
+        Intent dataCollectionIntent = new Intent(getApplicationContext(), DataCollectionService.class);
+        dataCollectionIntent.putExtra(getResources().getString(R.string.extra_datacollection_command), command);
+        getApplication().startService(dataCollectionIntent);
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 }

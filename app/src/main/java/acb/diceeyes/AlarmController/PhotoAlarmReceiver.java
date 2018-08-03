@@ -3,17 +3,15 @@ package acb.diceeyes.AlarmController;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
-//TODO: ANPASSEN!
+/*
+Receives alarms to initiate taking a photo
+ */
 public class PhotoAlarmReceiver extends BroadcastReceiver {
-    private boolean[] wasRescheduled = new boolean[6];
-    private long[] startTime = new long[6];
-    private int[] rescheduleCounter = new int[] {0, 0, 0, 0, 0, 0};
-    private int shiftMillisScreenOff = 20000;
-    private int shiftMillisPicIsCurrentlyTaken = 5000;
 
     private static final String TAG = PhotoAlarmReceiver.class.getSimpleName();
 
@@ -22,15 +20,9 @@ public class PhotoAlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int requestID = (int) intent.getExtras().get(String.valueOf(R.string.extra_requestid));
-
-        Storage storage = new Storage(context);
-
-        boolean wasAlreadyTaken = storage.getPhotoWasTakenInCurrentPeriod(requestID);
-        if (!wasAlreadyTaken){
-            ObservableObject.getInstance().setReminderPeriod(requestID);
-            ObservableObject.getInstance().updateValue(intent);
-        }
-
+        Log.v(TAG, "Photo Alarm received");
+        int periodForCapture = (int) intent.getExtras().get(String.valueOf(R.string.extra_period));
+        ObservableObject.getInstance().setPeriod(periodForCapture);
+        ObservableObject.getInstance().updateValue(intent);
     }
 }

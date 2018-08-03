@@ -19,10 +19,10 @@ public class ScreenOnOffReceiver extends BroadcastReceiver {
                 break;
             case Intent.ACTION_SCREEN_OFF:
                 Log.v(TAG, "Screen is off now.");
-                //TODO: ALARME canceln ObservableObject.getInstance().setIsScreenOn(false);
+                ObservableObject.getInstance().setScreenOn(false);
                 break;
             case Intent.ACTION_BOOT_COMPLETED:
-                //restarts the controller service after device reboot, which also sets new random alarms (which would be removed after device restart)
+                //restarts the controller service after device reboot
                 Log.v(TAG, "restart controller service after reboot");
                 Intent controllerIntent = new Intent(context, ControllerService.class);
                 context.startService(controllerIntent);

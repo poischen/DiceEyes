@@ -24,6 +24,7 @@ public class GazeGrid extends AppCompatActivity {
     private Storage storage;
     private int gazePointPosition;
     public static String GAZEPOINTPOSITION;
+    public int period = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,7 @@ public class GazeGrid extends AppCompatActivity {
             Bundle extras = getIntent().getExtras();
             if (extras != null) {
                 gazePointPosition = extras.getInt(GAZEPOINTPOSITION);
+                period = extras.getInt(String.valueOf(R.string.extra_period));
             }
         } catch (Exception e) {
             gazePointPosition = 0;
@@ -53,10 +55,10 @@ public class GazeGrid extends AppCompatActivity {
         ImageView imageView;
         switch (gazePointPosition){
             case 0: imageView = findViewById(R.id.iv0); break;
+            case 1: imageView = findViewById(R.id.iv1); break;
             case 2: imageView = findViewById(R.id.iv2); break;
+            case 3: imageView = findViewById(R.id.iv3); break;
             case 4: imageView = findViewById(R.id.iv4); break;
-            case 6: imageView = findViewById(R.id.iv6); break;
-            case 8: imageView = findViewById(R.id.iv8); break;
             default: imageView = findViewById(R.id.iv0);
         }
         imageView.setVisibility(View.VISIBLE);
@@ -84,6 +86,8 @@ public class GazeGrid extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(GazeGrid.this, R.string.gazegrid_toast_ok, Toast.LENGTH_SHORT).show();
                 //TODO: mark as valid in db
+                storage.setPhotoWasTaken(period, true);
+                storage.setNextGazePoint();
                 finish();
             }
         });
@@ -91,6 +95,8 @@ public class GazeGrid extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //TODO: mark as non valid in db
+                storage.setNextGazePoint();
+                finish();
             }
         });
         AlertDialog dialog = builder.create();

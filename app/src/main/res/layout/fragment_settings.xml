@@ -33,8 +33,7 @@
             android:layout_marginTop="7dp"
             android:entries="@array/settings_name_spinnerentries"
             android:gravity="left"
-            android:prompt="@string/settings_name_hl"
-            android:textAlignment="viewStart" />
+            android:prompt="@string/settings_name_hl" />
 
         <View
             android:layout_width="match_parent"
@@ -42,17 +41,6 @@
             android:background="@android:color/darker_gray"
             android:layout_marginTop="15dp"
             android:layout_marginBottom="15dp"/>
-
-        <TextView
-            android:id="@+id/startTimeTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:gravity="left|center_vertical|center_horizontal|center"
-            android:paddingLeft="15dp"
-            android:paddingTop="15dp"
-            android:text="@string/settings_time_start" />
 
         <TextView
             android:id="@+id/startTimeContentTextView"
@@ -73,18 +61,6 @@
             android:background="@android:color/darker_gray"
             android:layout_marginTop="15dp"
             android:layout_marginBottom="15dp" />
-
-        <TextView
-            android:id="@+id/endTimeTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:gravity="left|center_vertical|center_horizontal|center"
-            android:paddingLeft="15dp"
-            android:paddingTop="15dp"
-            android:text="@string/settings_time_end"
-           />
 
         <TextView
             android:id="@+id/endTimeContentTextView"

@@ -40,6 +40,9 @@
     <string name="extra_capturingevent">CapturingEvent</string>
     <string name="extra_capturingevent_init">init</string>
     <string name="extra_capturingevent_normal">normal</string>
+    <string name="extra_datacollection_command">command</string>
+    <string name="extra_period">calculatedPeriod</string>
+    <string name="extra_gazepoint">gazepoint</string>
 
     <!-- Alarm Periods -->
     <integer name="alarm_period_1">10</integer>

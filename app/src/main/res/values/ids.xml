@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="notification_id_service_running">456</integer>
-    <integer name="notification_id_reminderdatatransfer">41</integer>
-    <integer name="id_intent_requestcode_reminderdatatransfer">70</integer>
+    <integer name="notification_id_reminderdatatransfer">5578</integer>
+    <integer name="id_intent_requestcode_reminderdatatransfer">2</integer>
 </resources>

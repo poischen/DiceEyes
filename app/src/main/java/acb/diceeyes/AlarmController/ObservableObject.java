@@ -6,7 +6,8 @@ import java.util.Observable;
 public class ObservableObject extends Observable {
     private static ObservableObject instance = new ObservableObject();
 
-    private int reminderPeriod = 0;
+    boolean isScreenOn = true;
+    int period;
 
     public static ObservableObject getInstance() {
         return instance;
@@ -22,11 +23,19 @@ public class ObservableObject extends Observable {
         }
     }
 
-    public void setReminderPeriod(int reminderPeriod) {
-        this.reminderPeriod = reminderPeriod;
+    public boolean isScreenOn() {
+        return isScreenOn;
     }
-    public int getReminderPeriod() {
-        return reminderPeriod;
+    public void setScreenOn(boolean screenOn) {
+        isScreenOn = screenOn;
+    }
+
+    public void setPeriod(int period){
+        this.period = period;
+    }
+
+    public int getPeriod(){
+        return period;
     }
 
 }

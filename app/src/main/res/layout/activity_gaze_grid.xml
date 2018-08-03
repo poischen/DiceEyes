@@ -26,7 +26,27 @@
             android:scaleType="centerInside"
             />
         <ImageView
+            app:layout_columnWeight="1"
+            app:layout_gravity="center"
+            app:layout_rowWeight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/point"
+            android:visibility="invisible"
+            android:scaleType="centerInside"
+            />
+        <ImageView
             android:id="@+id/iv1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            android:src="@drawable/point"
+            app:layout_columnWeight="1"
+            app:layout_gravity="center"
+            android:visibility="invisible"
+            app:layout_rowWeight="1" />
+
+        <ImageView
             app:layout_columnWeight="1"
             app:layout_gravity="center"
             app:layout_rowWeight="1"
@@ -40,48 +60,25 @@
             android:id="@+id/iv2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:scaleType="centerInside"
+            app:layout_gravity="center"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"
             android:src="@drawable/point"
+            android:visibility="invisible"
+            android:scaleType="centerInside"
+            />
+        <ImageView
             app:layout_columnWeight="1"
             app:layout_gravity="center"
+            app:layout_rowWeight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/point"
             android:visibility="invisible"
-            app:layout_rowWeight="1" />
-
+            android:scaleType="centerInside"
+            />
         <ImageView
             android:id="@+id/iv3"
-            app:layout_columnWeight="1"
-            app:layout_gravity="center"
-            app:layout_rowWeight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/point"
-            android:visibility="invisible"
-            android:scaleType="centerInside"
-            />
-        <ImageView
-            android:id="@+id/iv4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_gravity="center"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1"
-            android:src="@drawable/point"
-            android:visibility="invisible"
-            android:scaleType="centerInside"
-            />
-        <ImageView
-            android:id="@+id/iv5"
-            app:layout_columnWeight="1"
-            app:layout_gravity="center"
-            app:layout_rowWeight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/point"
-            android:visibility="invisible"
-            android:scaleType="centerInside"
-            />
-        <ImageView
-            android:id="@+id/iv6"
             app:layout_columnWeight="1"
             app:layout_gravity="center"
             app:layout_rowWeight="1"
@@ -93,7 +90,6 @@
             android:adjustViewBounds="true"
             />
         <ImageView
-            android:id="@+id/iv7"
             app:layout_columnWeight="1"
             app:layout_gravity="center"
             app:layout_rowWeight="1"
@@ -104,7 +100,7 @@
             android:scaleType="centerInside"
             />
         <ImageView
-            android:id="@+id/iv8"
+            android:id="@+id/iv4"
             app:layout_columnWeight="1"
             app:layout_gravity="center"
             app:layout_rowWeight="1"
@@ -119,7 +115,7 @@
     <View
         android:id="@+id/gestureDetectorView"
         android:layout_width="wrap_content"
-        android:layout_height="567dp" />
+        android:layout_height="match_parent" />
 
 
 

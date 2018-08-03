@@ -50,6 +50,6 @@ public class TransferReminderAlarmReceiver extends BroadcastReceiver {
         notificationManager.notify((R.integer.notification_id_reminderdatatransfer), reviewNotificationBuilder.build());
 
         Storage storage = new Storage(context);
-        storage.setAllRandomWasTakenInCurrentPeriod(false);
+        storage.setAllPhotosWereTaken(false);
     }
 }

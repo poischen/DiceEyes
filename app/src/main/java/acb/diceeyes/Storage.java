@@ -90,6 +90,8 @@ public class Storage extends SQLiteOpenHelper {
     private SharedPreferences photoAlarmsStorage;
     private SharedPreferences.Editor photoAlarmsEditor;
 
+    private int gazePoint = 0;
+
     public Storage(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         Log.v(TAG, "Database created " + getDatabaseName());
@@ -125,13 +127,50 @@ public class Storage extends SQLiteOpenHelper {
         userAliasEditor.commit();
     }
 
-    public void setPhotoWasTakenInCurrentPeriod(int period, boolean wasTaken){
-        String p = period + "";
-        photoAlarmsEditor.putBoolean(p, wasTaken);
+    //remember a picture was taken in current period, no matter if it was a missing one of not
+    //increase counter
+    public void setPhotoWasTaken(int currentPeriod, boolean wasTaken){
+        if (currentPeriod > 0){
+            String p = currentPeriod + "";
+            photoAlarmsEditor.putBoolean(p, wasTaken);
+        }
         int counterValue = photoAlarmsStorage.getInt("counter", 0);
         Log.v(TAG, "counter value: " + counterValue);
         photoAlarmsEditor.putInt("counter", (counterValue+1));
         photoAlarmsEditor.commit();
+    }
+
+
+    public void setAllPhotosWereTaken(boolean wasTaken){
+        photoAlarmsEditor.putBoolean("10", wasTaken);
+        photoAlarmsEditor.putBoolean("105", wasTaken);
+        photoAlarmsEditor.putBoolean("11", wasTaken);
+        photoAlarmsEditor.putBoolean("115", wasTaken);
+        photoAlarmsEditor.putBoolean("12", wasTaken);
+        photoAlarmsEditor.putBoolean("125", wasTaken);
+        photoAlarmsEditor.putBoolean("13", wasTaken);
+        photoAlarmsEditor.putBoolean("135", wasTaken);
+        photoAlarmsEditor.putBoolean("14", wasTaken);
+        photoAlarmsEditor.putBoolean("145", wasTaken);
+        photoAlarmsEditor.putBoolean("15", wasTaken);
+        photoAlarmsEditor.putBoolean("155", wasTaken);
+        photoAlarmsEditor.putBoolean("16", wasTaken);
+        photoAlarmsEditor.putBoolean("165", wasTaken);
+        photoAlarmsEditor.putBoolean("17", wasTaken);
+        photoAlarmsEditor.putBoolean("175", wasTaken);
+        photoAlarmsEditor.putBoolean("18", wasTaken);
+        photoAlarmsEditor.putBoolean("185", wasTaken);
+        photoAlarmsEditor.putBoolean("19", wasTaken);
+        photoAlarmsEditor.putBoolean("195", wasTaken);
+        photoAlarmsEditor.commit();
+    }
+
+    public void setNextGazePoint(){
+        gazePoint = (int) Math.random() * 5;
+    }
+
+    public int getGazePoint() {
+        return gazePoint;
     }
 
     public boolean getPhotoWasTakenInCurrentPeriod(int period) {
@@ -140,46 +179,19 @@ public class Storage extends SQLiteOpenHelper {
         return getPhotoWasTakenInCurrentPeriod;
     }
 
-    //TODO: -1 checken/bedenken
-    public int getMissedPeriods(int period){
+    public int getMissedPeriods(int periodSoll){
         int countedPeriods = photoAlarmsStorage.getInt("counter", 0);
         int missedPeriods = 0;
-        if (countedPeriods < (period - 1)){
-            missedPeriods = period - 1 - countedPeriods;
+        if (countedPeriods < (periodSoll)){
+            Log.v(TAG, "period soll: " + periodSoll + ", counter: " + countedPeriods);
+            missedPeriods = periodSoll - countedPeriods;
+            Log.v(TAG, "missed periods: " + missedPeriods);
         }
         return missedPeriods;
     }
 
-   /* public void setAllPhotosWereTakenInCurrentPeriod(boolean wasTaken){
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-        photoAlarmsEditor.putBoolean(String.valueOf(R.string.alarm_period_1), wasTaken);
-
-        photoAlarmsEditor.commit();
-    }*/
-
     public String getStoragePath(){
         return STORAGEPATHIMG;
-    }
-
-    //TODO: set start mit date
-    public void setAlarmStart(Context context, String input, int index){
-        /*try {
-            userAliasEditor.putString(storage_user_name, input);
-            userAliasEditor.putInt(storage_user_index, index);
-            userAliasEditor.commit();
-            Log.d(TAG, "Alias stored: " + input);
-        } catch (Exception e){
-        }*/
     }
 
     @Override
