@@ -31,6 +31,8 @@ public class GazeGrid extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gaze_grid);
 
+        storage = new Storage(getApplicationContext());
+
         //gesture detector things
         View gestureDetectorView = findViewById(R.id.gestureDetectorView);
         gestureDetector = new GestureDetector(this, new GridViewGestureListener());

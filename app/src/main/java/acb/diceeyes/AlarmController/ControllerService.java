@@ -206,7 +206,7 @@ public class ControllerService extends Service implements Observer {
                  currentTime.setTimeInMillis(System.currentTimeMillis());
                  int hour = currentTime.get(Calendar.HOUR);
 
-                 if (hour > 7 && hour < 22){
+                 if (hour > 7 && hour < 21){
                      //check if it is necessary to take a picture in this period and set alarms if so
                      int period = calculatePeriod();
                      if (!wasAlreadyTakenInPeriod(period) && hour < 20){
@@ -219,6 +219,7 @@ public class ControllerService extends Service implements Observer {
                          }
                      }
                  } else {
+                     //reset counter at night
                      requestIdCounter = 3;
                  }
              }

@@ -51,5 +51,6 @@ public class TransferReminderAlarmReceiver extends BroadcastReceiver {
 
         Storage storage = new Storage(context);
         storage.setAllPhotosWereTaken(false);
+        storage.resetMissedPeriodsCounter();
     }
 }

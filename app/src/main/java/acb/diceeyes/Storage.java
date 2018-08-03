@@ -140,6 +140,11 @@ public class Storage extends SQLiteOpenHelper {
         photoAlarmsEditor.commit();
     }
 
+    public void resetMissedPeriodsCounter(){
+        photoAlarmsEditor.putInt("counter", 0);
+        photoAlarmsEditor.commit();
+    }
+
 
     public void setAllPhotosWereTaken(boolean wasTaken){
         photoAlarmsEditor.putBoolean("10", wasTaken);
