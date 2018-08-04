@@ -3,16 +3,24 @@ package acb.diceeyes.View;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -61,11 +69,12 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
     private PhotoReviewGridViewAdapter gridAdapter;
     private ArrayList<PhotoItem> pictureItems;
     private ArrayList<PhotoItem> taggedToDeleteItems = new ArrayList<>();
-    private Button deleteButton;
-    private Button uploadFTPButton;
+    //private Button deleteButton;
+    //private Button uploadFTPButton;
     private ProgressBar progressBar;
     private ProgressDialog uploadProgressDialog;
     private ProgressDialog connectProgressDialog;
+    private FloatingActionButton uploadFBA;
 
     private Storage storage;
 
@@ -77,6 +86,84 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
         NotificationManager notificationManager =
                 (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(R.integer.notification_id_reminderdatatransfer);
+
+        uploadFBA = (FloatingActionButton) findViewById(R.id.transferPhotosFAB);
+        uploadFBA.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                        if (!(pictureItems == null)) {
+                            Log.v(TAG, "upload via ftp");
+                            //AsyncTaskConnectAndUploadToFTP ftpTask = new AsyncTaskConnectAndUploadToFTP();
+                            //ftpTask.execute();
+
+                            //Feedback for connecting
+                            connectProgressDialog = new ProgressDialog(PhotoReviewTransferActivity.this);
+                            connectProgressDialog.setIndeterminate(false);
+                            connectProgressDialog.setMessage("Connecting... ");
+                            connectProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                            connectProgressDialog.setCancelable(true);
+
+                            //feedback for upload
+                            uploadProgressDialog = new ProgressDialog(PhotoReviewTransferActivity.this);
+                            uploadProgressDialog.setTitle("Uploading images");
+                            uploadProgressDialog.setMessage("Upload in progress... ");
+                            uploadProgressDialog.setProgressStyle(uploadProgressDialog.STYLE_HORIZONTAL);
+                            uploadProgressDialog.setProgress(0);
+                            uploadProgressDialog.setMax(pictureItems.size() + 1);
+
+                            AsyncTaskConnectAndUploadToSFTP sftpTask = new AsyncTaskConnectAndUploadToSFTP(PhotoReviewTransferActivity.this);
+                            sftpTask.execute();
+                            connectProgressDialog.show();
+                        }
+
+                AsyncTaskBuildGrid stbg = new AsyncTaskBuildGrid();
+                stbg.execute();
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_list, menu);
+        //deleteMenuItem = (MenuItem) menu.findItem(R.id.menu_item_delete);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int s = gridAdapter.getDataSize();
+        for (int i=0; i < s; i++){
+            PhotoItem currentItem = (PhotoItem) gridAdapter.getItem(i);
+            try {
+                if (currentItem.getCheckbox().isChecked()){
+                    taggedToDeleteItems.add(currentItem);
+                }
+            } catch (Exception e){
+
+            }
+        }
+
+        for (int i=0; i < taggedToDeleteItems.size(); i++)
+        {
+            try {
+                PhotoItem currentItem = taggedToDeleteItems.get(i);
+                gridAdapter.remove(currentItem);
+                File file = new File(taggedToDeleteItems.get(i).getAbsolutePath());
+                file.delete();
+                pictureItems.remove(currentItem);
+                Log.v(TAG, "File deleted: " + file);
+            }
+            catch (Exception e) {
+                Log.d(TAG, "file could not be deleted");
+            }
+        }
+
+        gridAdapter.notifyDataSetChanged();
+        taggedToDeleteItems.clear();
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -103,78 +190,6 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-        deleteButton = (Button) findViewById(R.id.picturesDeleteButton);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                int s = gridAdapter.getDataSize();
-                for (int i=0; i < s; i++){
-                    PhotoItem currentItem = (PhotoItem) gridAdapter.getItem(i);
-                    try {
-                        if (currentItem.getCheckbox().isChecked()){
-                            taggedToDeleteItems.add(currentItem);
-                        }
-                    } catch (Exception e){
-
-                    }
-                }
-
-                for (int i=0; i < taggedToDeleteItems.size(); i++)
-                {
-                    try {
-                        PhotoItem currentItem = taggedToDeleteItems.get(i);
-                        gridAdapter.remove(currentItem);
-                        File file = new File(taggedToDeleteItems.get(i).getAbsolutePath());
-                        file.delete();
-                        pictureItems.remove(currentItem);
-                        Log.v(TAG, "File deleted: " + file);
-                    }
-                    catch (Exception e) {
-                        Log.d(TAG, "file could not be deleted");
-                    }
-                }
-
-                gridAdapter.notifyDataSetChanged();
-                taggedToDeleteItems.clear();
-            }
-        });
-
-        uploadFTPButton = (Button) findViewById(R.id.picturesUploadButton);
-        uploadFTPButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                if (!(pictureItems == null)) {
-                    Log.v(TAG, "upload via ftp");
-                    //AsyncTaskConnectAndUploadToFTP ftpTask = new AsyncTaskConnectAndUploadToFTP();
-                    //ftpTask.execute();
-
-                    //Feedback for connecting
-                    connectProgressDialog = new ProgressDialog(PhotoReviewTransferActivity.this);
-                    connectProgressDialog.setIndeterminate(false);
-                    connectProgressDialog.setMessage("Connecting... ");
-                    connectProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                    connectProgressDialog.setCancelable(true);
-
-                    //feedback for upload
-                    uploadProgressDialog = new ProgressDialog(PhotoReviewTransferActivity.this);
-                    uploadProgressDialog.setTitle("Uploading images");
-                    uploadProgressDialog.setMessage("Upload in progress... ");
-                    uploadProgressDialog.setProgressStyle(uploadProgressDialog.STYLE_HORIZONTAL);
-                    uploadProgressDialog.setProgress(0);
-                    uploadProgressDialog.setMax(pictureItems.size() + 1);
-
-                    AsyncTaskConnectAndUploadToSFTP sftpTask = new AsyncTaskConnectAndUploadToSFTP(PhotoReviewTransferActivity.this);
-                    sftpTask.execute();
-                    connectProgressDialog.show();
-                }
-            }
-        });
-
-        AsyncTaskBuildGrid stbg = new AsyncTaskBuildGrid();
-        stbg.execute();
     }
 
     @Override
@@ -335,7 +350,7 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
                 String dataBase = getDatabase();
                 File databaseFile = new File(dataBase);
                 FileInputStream inputDB = new FileInputStream(databaseFile);
-                String remoteDB = "HDYHYPDataBase_" + time + ".db";
+                String remoteDB = Storage.DB_NAME + time + ".db";
                 sftp.put(inputDB, remoteDB, null);
                 inputDB.close();
                 Log.v(TAG, "upload db successful");

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Random;
 
 import acb.diceeyes.Collection.CapturePhotoService;
 import acb.diceeyes.Collection.DataCollectionService;
@@ -31,7 +32,7 @@ public class ControllerService extends Service implements Observer {
     private static final String TAG = ControllerService.class.getSimpleName();
 
     public static Storage storage;
-    private String capturingEvent = getString(R.string.extra_capturingevent_normal);
+    private String command;
 
     private boolean firstTrySuccessfullyFlag;
     private boolean isScreenActive = true;
@@ -59,9 +60,9 @@ public class ControllerService extends Service implements Observer {
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             storage = new Storage(getApplicationContext());
-            capturingEvent = getString(R.string.extra_capturingevent_init);
+            command = getString(R.string.extra_capturingevent_init);
             startCapturePictureService();
-            capturingEvent = getString(R.string.extra_capturingevent_normal);
+            command = getString(R.string.extra_capturingevent_normal);
             String storagePath = storage.getStoragePath();
             String userAlias = storage.getAlias();
             firstTrySuccessfullyFlag = true;
@@ -234,6 +235,7 @@ public class ControllerService extends Service implements Observer {
                     //start GazeGrid
                     Intent intent = new Intent(this, GazeGrid.class);
                     intent.putExtra(getString(R.string.extra_period), ObservableObject.getInstance().getPeriod());
+                    storage.setNextGazePoint();
                     intent.putExtra(GazeGrid.GAZEPOINTPOSITION, storage.getGazePoint());
                     startActivity(intent);
                 }
@@ -339,8 +341,9 @@ public class ControllerService extends Service implements Observer {
         pendingIntentArray.add(pendingIntent);
 
         //calculate random delay of 1-5 seconds
-        int randomSec = (int) Math.random() * 16;
-        int randomMilisec = (int) Math.random() * 1000;
+        Random random = new Random();
+        int randomSec =  random.nextInt(16);
+        int randomMilisec =  random.nextInt(1000);
 
         Calendar currentTime = Calendar.getInstance();
         currentTime.setTimeInMillis(System.currentTimeMillis());
@@ -390,7 +393,7 @@ public class ControllerService extends Service implements Observer {
 
     private boolean startCapturePictureService() {
         Intent capturePicServiceIntent = new Intent(this, CapturePhotoService.class);
-        capturePicServiceIntent.putExtra(getString(R.string.extra_capturingevent), capturingEvent);
+        capturePicServiceIntent.putExtra(getString(R.string.extra_datacollection_command), command);
         getApplicationContext().startService(capturePicServiceIntent);
         Log.v(TAG, "CapturePicService will be started now");
         return true;

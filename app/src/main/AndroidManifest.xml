@@ -53,6 +53,8 @@
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <service android:name=".Collection.CapturePhotoService" />
+        <service android:name=".Collection.DataCollectionService" />
+        <service android:name=".AlarmController.ControllerService" />
 
         <activity
             android:name=".View.PhotoReviewTransferActivity"

@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import acb.diceeyes.AlarmController.ControllerService;
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 
@@ -116,251 +115,251 @@ public class DataCollectionService extends Service implements LocationListener, 
     public int onStartCommand(Intent intent, int flags, int startId) {
         ContentValues cv = new ContentValues();
         String command = "";
-        String capturingEvent = "";
 
         try {
             command = (String) intent.getExtras().get(getString(R.string.extra_datacollection_command));
-        } catch (Exception e) {
-            Log.v(TAG, "onStartCommand intent null");
-        }
 
-        try {
-            photoName = (String) intent.getExtras().get(PICTURENAME);
-        } catch (NullPointerException e) {
-            Log.v(TAG, "photoName was null");
-        }
+            try {
+                photoName = (String) intent.getExtras().get(PICTURENAME);
+            } catch (NullPointerException e) {
+                Log.v(TAG, "photoName was null");
+            }
 
-        switch (command) {
-            case COMMAND_UPDATE:
-                String value = (String) intent.getExtras().get(PICTUREVALUE);
+            Log.v(TAG, "command " + command);
+            switch (command) {
+                case COMMAND_UPDATE:
+                    String value = (String) intent.getExtras().get(PICTUREVALUE);
 
-                storage = new Storage(getApplicationContext());
-                database = storage.getWritableDatabase();
-                String updateSQL = "UPDATE " + Storage.DB_TABLE + " SET " + Storage.COLUMN_VALID + " = " + value + " WHERE " + Storage.COLUMN_PHOTO + " = " + photoName;
-                database.execSQL(updateSQL);
-                Log.v(TAG, "db udpate string " + updateSQL);
-                Log.v(TAG, "validity update");
-                database.close();
-                break;
-            case COMMAND_REGISTER:
-                registerListener();
-                break;
-            case (COMMAND_UNREGISTER):
-                unregisterListener();
-                break;
-            default:
-                try {
-                    gazePoint = (int) intent.getExtras().get(GAZEPOINTPOSITION);
-                    capturingEvent = (String) intent.getExtras().get(getString(R.string.extra_capturingevent));
-                    Log.v(TAG, "gazePoint int onStartCommand: " + gazePoint);
-                } catch (Exception e) {
-                    Log.v(TAG, "onStartCommand intent null");
-                }
-
-                if (capturingEvent.equals(getString(R.string.extra_capturingevent_normal)) || capturingEvent.equals(null)) {
-                    //Read and store current data-----------------------------------------------------------
-                    //photo name--------------------------------------------------------------------------
-                    cv.put(Storage.COLUMN_PHOTO, photoName);
-                    Log.v(TAG, "photoName" + photoName);
-
-                    //capture Event-------------------------------------------------------------------------
-                    cv.put(Storage.COLUMN_CAPTUREEVENT, capturingEvent);
-                    Log.v(TAG, "captureEvent: " + capturingEvent);
-
-                    //location------------------------------------------------------------------------------
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
+                    storage = new Storage(getApplicationContext());
+                    database = storage.getWritableDatabase();
+                    String updateSQL = "UPDATE " + Storage.DB_TABLE + " SET " + Storage.COLUMN_VALID + " = " + value + " WHERE " + Storage.COLUMN_PHOTO + " = " + photoName;
+                    database.execSQL(updateSQL);
+                    Log.v(TAG, "db udpate string " + updateSQL);
+                    Log.v(TAG, "validity update");
+                    database.close();
+                    break;
+                case COMMAND_REGISTER:
+                    registerListener();
+                    break;
+                case (COMMAND_UNREGISTER):
+                    unregisterListener();
+                    break;
+                default:
+                    try {
+                        gazePoint = (int) intent.getExtras().get(GAZEPOINTPOSITION);
+                        Log.v(TAG, "gazePoint int onStartCommand: " + gazePoint);
+                    } catch (Exception e) {
+                        Log.v(TAG, "onStartCommand intent null");
                     }
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                            2000, 1, this);
-                    latestLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
-                    if (latestLocation != null) {
-                        Log.v(TAG, "latest location: " + latestLocation);
-                        Geocoder geocoder = new Geocoder(this);
-                        double locaLat = latestLocation.getLatitude();
-                        double locLong = latestLocation.getLongitude();
+                    if (command.equals(getString(R.string.extra_capturingevent_normal)) || command.equals(null)) {
+                        //Read and store current data-----------------------------------------------------------
+                        //photo name--------------------------------------------------------------------------
+                        cv.put(Storage.COLUMN_PHOTO, photoName);
+                        Log.v(TAG, "photoName" + photoName);
 
-                        locationLatitude = (int) (locaLat * 1000000);
-                        locationLongitude = (int) (locLong * 10000000);
+                        //capture Event-------------------------------------------------------------------------
+                        cv.put(Storage.COLUMN_CAPTURECOMMAND, command);
+                        Log.v(TAG, "captureEvent: " + command);
+
+                        //location------------------------------------------------------------------------------
+                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                        }
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                                2000, 1, this);
+                        latestLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+                        if (latestLocation != null) {
+                            Log.v(TAG, "latest location: " + latestLocation);
+                            Geocoder geocoder = new Geocoder(this);
+                            double locaLat = latestLocation.getLatitude();
+                            double locLong = latestLocation.getLongitude();
+
+                            locationLatitude = (int) (locaLat * 1000000);
+                            locationLongitude = (int) (locLong * 10000000);
+                            try {
+                                List<Address> addressList = null;
+                                addressList = geocoder.getFromLocation(locaLat, locLong, 1);
+                                Address address = addressList.get(0);
+                                locationRoad = address.getThoroughfare();
+                                locationPLZ = address.getPostalCode();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            latestLocation = null;
+                        }
+
+                        locationManager.removeUpdates(this);
+
+                        cv.put(Storage.COLUMN_LOCATIONLATITUDE, locationLatitude);
+                        cv.put(Storage.COLUMN_LOCATIONLONGITUDE, locationLongitude);
+                        cv.put(Storage.COLUMN_LOCATIONROAD, locationRoad);
+                        cv.put(Storage.COLUMN_LOCATIONPOSTALCODE, locationPLZ);
+                        Log.v(TAG, "location: latitude: " + locationLatitude + ", longitude: " + locationLongitude + ", road: " + locationRoad + ", postalcode: " + locationPLZ);
+
+                        //accelerometer-------------------------------------------------------------------------
+                        cv.put(Storage.COLUMN_ACCELEROMETERX, accelerometerX.toString());
+                        cv.put(Storage.COLUMN_ACCELEROMETERY, accelerometerY.toString());
+                        cv.put(Storage.COLUMN_ACCELEROMETERZ, accelerometerZ.toString());
+                        Log.v(TAG, "accelerometer: " + accelerometerX + " " + accelerometerY + " " + accelerometerZ);
+
+                        //rotation------------------------------------------------------------------------------
+                        cv.put(Storage.COLUMN_GYROSCOPEX, gyroscopeX);
+                        cv.put(Storage.COLUMN_GYROSCOPEY, gyroscopeY);
+                        cv.put(Storage.COLUMN_GYROSCOPEZ, gyroscopeZ);
+                        Log.v(TAG, "gyroscope: " + gyroscopeX + " " + gyroscopeY + " " + gyroscopeZ);
+
+                        //light---------------------------------------------------------------------------------
+                        cv.put(Storage.COLUMN_LIGHT, ambientLight);
+                        Log.v(TAG, "light:" + ambientLight);
+
+                        //screen brightness---------------------------------------------------------------------
                         try {
-                            List<Address> addressList = null;
-                            addressList = geocoder.getFromLocation(locaLat, locLong, 1);
-                            Address address = addressList.get(0);
-                            locationRoad = address.getThoroughfare();
-                            locationPLZ = address.getPostalCode();
-                        } catch (IOException e) {
+                            screenBrightness = android.provider.Settings.System.getInt(
+                                    getContentResolver(),
+                                    android.provider.Settings.System.SCREEN_BRIGHTNESS);
+                        } catch (Settings.SettingNotFoundException e) {
                             e.printStackTrace();
                         }
-                        latestLocation = null;
-                    }
+                        cv.put(Storage.COLUMN_BRIGHTNESS, screenBrightness);
+                        Log.v(TAG, "screen brightness: " + screenBrightness);
 
-                    locationManager.removeUpdates(this);
+                        //orientation---------------------------------------------------------------------------
+                        cv.put(Storage.COLUMN_ORIENTATION, orientation);
+                        Log.v(TAG, "orientation: " + orientation);
 
-                    cv.put(Storage.COLUMN_LOCATIONLATITUDE, locationLatitude);
-                    cv.put(Storage.COLUMN_LOCATIONLONGITUDE, locationLongitude);
-                    cv.put(Storage.COLUMN_LOCATIONROAD, locationRoad);
-                    cv.put(Storage.COLUMN_LOCATIONPOSTALCODE, locationPLZ);
-                    Log.v(TAG, "location: latitude: " + locationLatitude + ", longitude: " + locationLongitude + ", road: " + locationRoad + ", postalcode: " + locationPLZ);
-
-                    //accelerometer-------------------------------------------------------------------------
-                    cv.put(Storage.COLUMN_ACCELEROMETERX, accelerometerX.toString());
-                    cv.put(Storage.COLUMN_ACCELEROMETERY, accelerometerY.toString());
-                    cv.put(Storage.COLUMN_ACCELEROMETERZ, accelerometerZ.toString());
-                    Log.v(TAG, "accelerometer: " + accelerometerX + " " + accelerometerY + " " + accelerometerZ);
-
-                    //rotation------------------------------------------------------------------------------
-                    cv.put(Storage.COLUMN_GYROSCOPEX, gyroscopeX);
-                    cv.put(Storage.COLUMN_GYROSCOPEY, gyroscopeY);
-                    cv.put(Storage.COLUMN_GYROSCOPEZ, gyroscopeZ);
-                    Log.v(TAG, "gyroscope: " + gyroscopeX + " " + gyroscopeY + " " + gyroscopeZ);
-
-                    //light---------------------------------------------------------------------------------
-                    cv.put(Storage.COLUMN_LIGHT, ambientLight);
-                    Log.v(TAG, "light:" + ambientLight);
-
-                    //screen brightness---------------------------------------------------------------------
-                    try {
-                        screenBrightness = android.provider.Settings.System.getInt(
-                                getContentResolver(),
-                                android.provider.Settings.System.SCREEN_BRIGHTNESS);
-                    } catch (Settings.SettingNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    cv.put(Storage.COLUMN_BRIGHTNESS, screenBrightness);
-                    Log.v(TAG, "screen brightness: " + screenBrightness);
-
-                    //orientation---------------------------------------------------------------------------
-                    cv.put(Storage.COLUMN_ORIENTATION, orientation);
-                    Log.v(TAG, "orientation: " + orientation);
-
-                    //battery level & status----------------------------------------------------------------
-                    if (Build.VERSION.SDK_INT >= 23) {
-                        BatteryManager batteryManager = (BatteryManager) getSystemService(BATTERY_SERVICE);
-                        batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-                        if (batteryManager.isCharging()) {
-                            batteryStatus = "charging";
-                        } else {
-                            batteryStatus = "nothing";
+                        //battery level & status----------------------------------------------------------------
+                        if (Build.VERSION.SDK_INT >= 23) {
+                            BatteryManager batteryManager = (BatteryManager) getSystemService(BATTERY_SERVICE);
+                            batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+                            if (batteryManager.isCharging()) {
+                                batteryStatus = "charging";
+                            } else {
+                                batteryStatus = "nothing";
+                            }
                         }
-                    }
 
-                    cv.put(Storage.COLUMN_BATTERYSTATUS, batteryStatus);
-                    Log.v(TAG, "batteryStatus: " + batteryStatus);
+                        cv.put(Storage.COLUMN_BATTERYSTATUS, batteryStatus);
+                        Log.v(TAG, "batteryStatus: " + batteryStatus);
 
-                    cv.put(Storage.COLUMN_BATTERYLEVEL, batteryLevel);
-                    Log.v(TAG, "batteryLevel: " + batteryLevel);
+                        cv.put(Storage.COLUMN_BATTERYLEVEL, batteryLevel);
+                        Log.v(TAG, "batteryLevel: " + batteryLevel);
 
-                    //gazepoint----------------------------------------------------------------
-                    cv.put(Storage.COLUMN_GAZEPOINT, gazePoint);
-                    cv.put(Storage.COLUMN_VALID, "");
-                    Log.v(TAG, "gaze Point: " + gazePoint);
+                        //gazepoint----------------------------------------------------------------
+                        cv.put(Storage.COLUMN_GAZEPOINT, gazePoint);
+                        cv.put(Storage.COLUMN_VALID, pictureValidity);
+                        Log.v(TAG, "gaze Point: " + gazePoint);
 
-                } else {//read general sensor information and store to db---------------------------------------
-                    try {
-                        photoName = (String) intent.getExtras().get(PICTURENAME);
-                    } catch (NullPointerException e) {
-                    }
-                    cv.put(Storage.COLUMN_PHOTO, photoName);
-                    Log.v(TAG, "photoName" + photoName);
-
-                    cv.put(Storage.COLUMN_CAPTUREEVENT, capturingEvent);
-                    Log.v(TAG, "captureEvent: " + capturingEvent);
-
-                    cv.put(Storage.COLUMN_LOCATIONLATITUDE, locationLatitude);
-                    cv.put(Storage.COLUMN_LOCATIONLONGITUDE, locationLongitude);
-                    cv.put(Storage.COLUMN_LOCATIONROAD, locationRoad);
-                    cv.put(Storage.COLUMN_LOCATIONPOSTALCODE, locationPLZ);
-                    Log.v(TAG, "location: latitude: " + locationLatitude + ", longitude: " + locationLongitude + ", road: " + locationRoad + ", postalcode: " + locationPLZ);
-
-                    try {
-                        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER).toString();
-                    } catch (Exception e) {
-                        Log.d(TAG, "no accelerometerSensor found");
-                    }
-
-                    cv.put(Storage.COLUMN_ACCELEROMETERX, accelerometerSensor);
-                    cv.put(Storage.COLUMN_ACCELEROMETERY, NASTRING);
-                    cv.put(Storage.COLUMN_ACCELEROMETERZ, NASTRING);
-                    Log.v(TAG, "accelerometer Sensor:" + accelerometerSensor);
-
-                    try {
-                        gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE).toString();
-                    } catch (Exception e) {
-                        Log.d(TAG, "no gyroscopeSensor found");
-                    }
-                    cv.put(Storage.COLUMN_GYROSCOPEX, gyroscopeSensor);
-                    cv.put(Storage.COLUMN_GYROSCOPEY, gyroscopeY);
-                    cv.put(Storage.COLUMN_GYROSCOPEZ, gyroscopeZ);
-                    Log.v(TAG, "gyroscope Sensor:" + gyroscopeSensor);
-
-                    try {
-                        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT).toString();
-                    } catch (Exception e) {
-                        Log.d(TAG, "no lightSensor found");
-                    }
-                    cv.put(Storage.COLUMN_LIGHT, lightSensor);
-                    Log.v(TAG, "light Sensor:" + lightSensor);
-
-                    int minScreenBrightness = 0;
-                    int maxScreenBrightness = 255;
-                    final Resources resources = Resources.getSystem();
-
-                    int idMin = resources.getIdentifier("config_screenBrightnessSettingMinimum", "integer", "android");
-                    if (idMin != 0) {
+                    } else {//read general sensor information and store to db---------------------------------------
                         try {
-                            minScreenBrightness = resources.getInteger(idMin);
-                        } catch (Resources.NotFoundException e) {
+                            photoName = (String) intent.getExtras().get(PICTURENAME);
+                        } catch (NullPointerException e) {
                         }
-                    }
+                        cv.put(Storage.COLUMN_PHOTO, photoName);
+                        Log.v(TAG, "photoName" + photoName);
 
-                    int idMax = resources.getIdentifier("config_screenBrightnessSettingMaximum", "integer", "android");
-                    if (idMax != 0) {
+                        cv.put(Storage.COLUMN_CAPTURECOMMAND, command);
+                        Log.v(TAG, "captureEvent: " + command);
+
+                        cv.put(Storage.COLUMN_LOCATIONLATITUDE, locationLatitude);
+                        cv.put(Storage.COLUMN_LOCATIONLONGITUDE, locationLongitude);
+                        cv.put(Storage.COLUMN_LOCATIONROAD, locationRoad);
+                        cv.put(Storage.COLUMN_LOCATIONPOSTALCODE, locationPLZ);
+                        Log.v(TAG, "location: latitude: " + locationLatitude + ", longitude: " + locationLongitude + ", road: " + locationRoad + ", postalcode: " + locationPLZ);
+
                         try {
-                            maxScreenBrightness = resources.getInteger(idMax);
-                        } catch (Resources.NotFoundException e) {
+                            accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER).toString();
+                        } catch (Exception e) {
+                            Log.d(TAG, "no accelerometerSensor found");
                         }
+
+                        cv.put(Storage.COLUMN_ACCELEROMETERX, accelerometerSensor);
+                        cv.put(Storage.COLUMN_ACCELEROMETERY, NASTRING);
+                        cv.put(Storage.COLUMN_ACCELEROMETERZ, NASTRING);
+                        Log.v(TAG, "accelerometer Sensor:" + accelerometerSensor);
+
+                        try {
+                            gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE).toString();
+                        } catch (Exception e) {
+                            Log.d(TAG, "no gyroscopeSensor found");
+                        }
+                        cv.put(Storage.COLUMN_GYROSCOPEX, gyroscopeSensor);
+                        cv.put(Storage.COLUMN_GYROSCOPEY, gyroscopeY);
+                        cv.put(Storage.COLUMN_GYROSCOPEZ, gyroscopeZ);
+                        Log.v(TAG, "gyroscope Sensor:" + gyroscopeSensor);
+
+                        try {
+                            lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT).toString();
+                        } catch (Exception e) {
+                            Log.d(TAG, "no lightSensor found");
+                        }
+                        cv.put(Storage.COLUMN_LIGHT, lightSensor);
+                        Log.v(TAG, "light Sensor:" + lightSensor);
+
+                        int minScreenBrightness = 0;
+                        int maxScreenBrightness = 255;
+                        final Resources resources = Resources.getSystem();
+
+                        int idMin = resources.getIdentifier("config_screenBrightnessSettingMinimum", "integer", "android");
+                        if (idMin != 0) {
+                            try {
+                                minScreenBrightness = resources.getInteger(idMin);
+                            } catch (Resources.NotFoundException e) {
+                            }
+                        }
+
+                        int idMax = resources.getIdentifier("config_screenBrightnessSettingMaximum", "integer", "android");
+                        if (idMax != 0) {
+                            try {
+                                maxScreenBrightness = resources.getInteger(idMax);
+                            } catch (Resources.NotFoundException e) {
+                            }
+                        }
+
+                        String screenBrightnessString = minScreenBrightness + "0" + maxScreenBrightness;
+                        screenBrightness = Integer.parseInt(screenBrightnessString);
+
+                        cv.put(Storage.COLUMN_BRIGHTNESS, screenBrightness);
+                        Log.v(TAG, "screenBrightness: " + screenBrightness);
+
+
+                        try {
+                            rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).toString();
+                        } catch (Exception e) {
+                            Log.d(TAG, "no rotationVectorSensor found");
+                        }
+                        cv.put(Storage.COLUMN_ORIENTATION, rotationVectorSensor);
+                        Log.v(TAG, "orientation Sensor:" + rotationVectorSensor);
+
+                        cv.put(Storage.COLUMN_BATTERYSTATUS, batteryStatus);
+                        Log.v(TAG, "batteryStatus: " + batteryStatus);
+
+                        cv.put(Storage.COLUMN_BATTERYLEVEL, batteryLevel);
+                        Log.v(TAG, "batteryLevel: " + batteryLevel);
+
+                        //gazepoint & valitidy----------------------------------------------------------------
+                        cv.put(Storage.COLUMN_GAZEPOINT, gazePoint);
+                        cv.put(Storage.COLUMN_VALID, pictureValidity);
+                        Log.v(TAG, "gaze Point: " + gazePoint);
+
+                        Log.v(TAG, "VALUES " + cv.toString());
                     }
 
-                    String screenBrightnessString = minScreenBrightness + "0" + maxScreenBrightness;
-                    screenBrightness = Integer.parseInt(screenBrightnessString);
+                    //write data to database--------------------------------------------------------------------
+                    storage = new Storage(getApplicationContext());
+                    database = storage.getWritableDatabase();
+                    long insertIdWrite = database.insert(Storage.DB_TABLE, null, cv);
+                    Log.v(TAG, "data stored to db");
+                    database.close();
 
-                    cv.put(Storage.COLUMN_BRIGHTNESS, screenBrightness);
-                    Log.v(TAG, "screenBrightness: " + screenBrightness);
+                    //reset values not depending from sensor listener
+                    photoName = locationRoad = locationPLZ = orientation = batteryStatus = NASTRING;
+                    locationLatitude = locationLongitude = screenBrightness = NAINT;
+            }
 
-
-                    try {
-                        rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).toString();
-                    } catch (Exception e) {
-                        Log.d(TAG, "no rotationVectorSensor found");
-                    }
-                    cv.put(Storage.COLUMN_ORIENTATION, rotationVectorSensor);
-                    Log.v(TAG, "orientation Sensor:" + rotationVectorSensor);
-
-                    cv.put(Storage.COLUMN_BATTERYSTATUS, batteryStatus);
-                    Log.v(TAG, "batteryStatus: " + batteryStatus);
-
-                    cv.put(Storage.COLUMN_BATTERYLEVEL, batteryLevel);
-                    Log.v(TAG, "batteryLevel: " + batteryLevel);
-
-                    //gazepoint & valitidy----------------------------------------------------------------
-                    cv.put(Storage.COLUMN_GAZEPOINT, gazePoint);
-                    cv.put(Storage.COLUMN_VALID, "");
-                    Log.v(TAG, "gaze Point: " + gazePoint);
-
-                    Log.v(TAG, "VALUES " + cv.toString());
-                }
-
-        //write data to database--------------------------------------------------------------------
-        storage = new Storage(getApplicationContext());
-        database = storage.getWritableDatabase();
-        long insertIdWrite = database.insert(Storage.DB_TABLE, null, cv);
-        Log.v(TAG, "data stored to db");
-        database.close();
-
-        //reset values not depending from sensor listener
-        photoName = locationRoad = locationPLZ = orientation = batteryStatus = NASTRING;
-        locationLatitude = locationLongitude = screenBrightness = NAINT;
+        } catch (Exception e) {
+            Log.v(TAG, "onStartCommand intent null");
         }
 
         return START_STICKY;

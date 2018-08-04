@@ -21,7 +21,7 @@ public class PhotoAlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.v(TAG, "Photo Alarm received");
-        int periodForCapture = (int) intent.getExtras().get(String.valueOf(R.string.extra_period));
+        int periodForCapture = (int) intent.getExtras().get(context.getApplicationContext().getResources().getString(R.string.extra_period));
         ObservableObject.getInstance().setPeriod(periodForCapture);
         ObservableObject.getInstance().updateValue(intent);
     }

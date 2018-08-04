@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.io.File;
+import java.util.Random;
 
 import static android.database.sqlite.SQLiteDatabase.openOrCreateDatabase;
 
@@ -32,7 +33,7 @@ public class Storage extends SQLiteOpenHelper {
     public static final String DB_TABLE = "DiceEyesDataCollection";
     public static final String COLUMN_CAPTURE_ID = "_id";
     public static final String COLUMN_PHOTO = "photoName";
-    public static final String COLUMN_CAPTUREEVENT = "captureEvent";
+    public static final String COLUMN_CAPTURECOMMAND = "command";
     public static final String COLUMN_FOREGROUNDAPP = "foregroundApp";
     public static final String COLUMN_GYROSCOPEX = "gyroscopeX";
     public static final String COLUMN_GYROSCOPEY = "gyroscopeY";
@@ -50,7 +51,7 @@ public class Storage extends SQLiteOpenHelper {
     public static final String COLUMN_LOCATIONROAD = "LocationRoad";
     public static final String COLUMN_LOCATIONPOSTALCODE = "LocationPLZ";
     public static final String COLUMN_GAZEPOINT = "gazepoint";
-    public static final String COLUMN_VALID = "validity";
+    public static final String COLUMN_VALID = "isValid";
 
     public static final String storage_user_pref = "Alias Storage";
     public static final String storage_user_name = "Alias";
@@ -61,7 +62,7 @@ public class Storage extends SQLiteOpenHelper {
             "CREATE TABLE " + DB_TABLE +
                     "(" + COLUMN_CAPTURE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_PHOTO + " TEXT, " +
-                    COLUMN_CAPTUREEVENT + " TEXT, " +
+                    COLUMN_CAPTURECOMMAND + " TEXT, " +
                     COLUMN_FOREGROUNDAPP + " TEXT, " +
                     COLUMN_LOCATIONLATITUDE + " INTEGER, " +
                     COLUMN_LOCATIONLONGITUDE + " INTEGER, " +
@@ -78,7 +79,7 @@ public class Storage extends SQLiteOpenHelper {
                     COLUMN_ORIENTATION + " TEXT, " +
                     COLUMN_BATTERYSTATUS + " TEXT, " +
                     COLUMN_BATTERYLEVEL + " INTEGER, " +
-                    COLUMN_GAZEPOINT + " TEXT " +
+                    COLUMN_GAZEPOINT + " TEXT," +
                     COLUMN_VALID + " TEXT);";
 
 
@@ -173,7 +174,8 @@ public class Storage extends SQLiteOpenHelper {
     }
 
     public void setNextGazePoint(){
-        gazePoint = (int) Math.random() * 5;
+        Random random = new Random();
+        gazePoint =  random.nextInt(5);
     }
 
     public int getGazePoint() {
@@ -214,9 +216,7 @@ public class Storage extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.v(TAG, "onUpgrade called");
-        if (newVersion == 1){
 
-        }
     }
 
     public static boolean isServiceRunning(Context context, String serviceName){

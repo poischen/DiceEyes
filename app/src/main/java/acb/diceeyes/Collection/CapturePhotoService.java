@@ -15,9 +15,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
@@ -36,7 +33,7 @@ public class CapturePhotoService extends Service {
     private String userName;
     private SurfaceTexture surfaceTexture;
     private String photoName;
-    private String event;
+    private String command;
 
     public CapturePhotoService() {
         super();
@@ -55,15 +52,15 @@ public class CapturePhotoService extends Service {
             surfaceTexture = new SurfaceTexture(0);
             camera.setPreviewTexture(surfaceTexture);
 
-            event = (String) intent.getExtras().get(getString(R.string.extra_capturingevent_normal));
+            command = (String) intent.getExtras().get(getString(R.string.extra_datacollection_command));
+            Log.v(TAG, "command " + command);
             photoName = (String) intent.getExtras().get(getString(R.string.extra_photoName));
-
+            Log.v(TAG, "photoName " + photoName);
             capturePhoto();
 
         } catch (Exception e) {
             e.printStackTrace();
             Log.v(TAG, "camera instance not found" + e);
-            //TODO: reschedule Alarm
         }
 
         return START_STICKY;
@@ -201,7 +198,7 @@ public class CapturePhotoService extends Service {
     public void startDataCollectionService() {
         Intent dataCollectionIntent = new Intent(getApplicationContext(), DataCollectionService.class);
             dataCollectionIntent.putExtra(DataCollectionService.PICTURENAME, photoName);
-            dataCollectionIntent.putExtra(getString(R.string.extra_capturingevent), event);
+            dataCollectionIntent.putExtra(getString(R.string.extra_datacollection_command), command);
         getApplicationContext().startService(dataCollectionIntent);
     }
 

@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         startStopButton = (ImageButton) findViewById(R.id.startStopButton);
         aliasSpinner = (Spinner) findViewById(R.id.spinnerNames);
+
         chooseAliasHLtv = (TextView) findViewById(R.id.tellMeYourNameTextView);
         hellotv = (TextView) findViewById(R.id.helloTextView);
 
@@ -64,34 +65,17 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 scaleAnimation();
                 if  (storage.isServiceRunning(getApplicationContext(), ControllerService.class.getName())){
+                    Log.v(TAG, "service is alreay running");
                     startStopButton.setImageDrawable(getResources().getDrawable(R.drawable.icon_is_off));
                     Intent controllerIntent = new Intent(getApplicationContext(), ControllerService.class);
                     stopService(controllerIntent);
                     Intent dataIntent = new Intent(getApplicationContext(), DataCollectionService.class);
                     stopService(dataIntent);
                 } else {
+                    Log.v(TAG, "service is not running");
                     startControllerService();
                 }
             }
-        });
-
-        aliasSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                if (storage.isServiceRunning(getApplicationContext(), ControllerService.class.getName())){
-                    Toast.makeText(MainActivity.this, getString(R.string.error_error_alreadyrunning), Toast.LENGTH_LONG).show();
-                } else if (storage.getAlias() == null){
-                    storeAlias(aliasSpinner.getSelectedItem().toString());
-                } else if (storage.getAlias() != null){
-                    showConfirmation();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-            }
-
         });
 
         //give feedback, if a userName is already stored and restart the service, if it is not running although a username is already set
@@ -99,10 +83,33 @@ public class MainActivity extends AppCompatActivity {
         if (!(storage.getAlias() == null)) {
             aliasAlreadySet();
         }
-
-
-        spinnerIsActive = true;
     }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        aliasSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                if (position > 0){
+                    if (storage.isServiceRunning(getApplicationContext(), ControllerService.class.getName())){
+                        Toast.makeText(MainActivity.this, getString(R.string.error_error_alreadyrunning), Toast.LENGTH_LONG).show();
+                    } else if (storage.getAlias() == null){
+                        storeAlias(aliasSpinner.getSelectedItem().toString());
+                    } else if (storage.getAlias() != null){
+                        showConfirmation();
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+
+        });
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -149,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
 
             DateFormat dateFormat = new SimpleDateFormat(getString(R.string.global_date_pattern));
             String timeString = dateFormat.format(new Date());
-            String test = getString(R.string.log_file_filename);
 
             path = File.separator
                     + storage.getAlias() + getString(R.string.log_file_filename) + timeString + getString(R.string.log_file_filespec);
@@ -169,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         mailIntent.setFlags(FLAG_ACTIVITY_NEW_TASK);
         mailIntent.setType("text/plain");
         mailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{getString(R.string.log_mail_address)});
-        mailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.log_mail_subject) + storage.getAlias());
+        mailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.log_mail_subject)  + " " + storage.getAlias());
         ArrayList<CharSequence> text = new ArrayList<CharSequence>();
         text.add(getString(R.string.log_mail_msg));
         mailIntent.putExtra(Intent.EXTRA_TEXT, text);
@@ -186,8 +192,10 @@ public class MainActivity extends AppCompatActivity {
     /*Starts a longlasting Service which controlls and triggers the gaze grid */
     private void startControllerService(){
         if (storage.getAlias() != null) {
+            Log.v(TAG, "startControllerService");
             Intent controllerIntent = new Intent(this, ControllerService.class);
             getApplicationContext().startService(controllerIntent);
+            startStopButton.setImageDrawable(getResources().getDrawable(R.drawable.icon_is_on));
         } else {
             Toast.makeText(this, getString(R.string.error_missing_alias), Toast.LENGTH_SHORT).show();
         }
@@ -213,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
             }
             storage.setAlias(getApplicationContext(), input, index);
             Log.v(TAG, "Study alias read: " + input);
-            Toast.makeText(this, getString(R.string.main_toast_alias_set) + input, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.main_toast_alias_set) + " " + input, Toast.LENGTH_SHORT).show();
             aliasAlreadySet();
             Log.v(TAG, "Study alias successfully stored:" + input);
         } catch (NullPointerException e) {
@@ -229,9 +237,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private void aliasAlreadySet() {
         String alias = storage.getAlias();
-        aliasSpinner.setSelection(storage.getAliasIndex());
         hellotv.setText(getString(R.string.main_hello) + " " + alias + "!");
-        chooseAliasHLtv.setEnabled(false);
+        chooseAliasHLtv.setVisibility(View.GONE);
         startStopButton.setEnabled(true);
 
         if (storage.isServiceRunning(getApplicationContext(), ControllerService.class.getName())){
@@ -245,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
         final String newAlias = aliasSpinner.getSelectedItem().toString();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.main_alertdialog_title));
-        builder.setMessage(getString(R.string.main_alertdialog_content1) + storage.getAlias() + getString(R.string.main_alertdialog_content2) + newAlias + getString(R.string.main_alertdialog_content3));
+        builder.setMessage(getString(R.string.main_alertdialog_content1) + " " + storage.getAlias() + " " + getString(R.string.main_alertdialog_content2) + " " + newAlias + " " + getString(R.string.main_alertdialog_content3));
 
         builder.setPositiveButton(getString(R.string.main_alertdialog_buttonok), new DialogInterface.OnClickListener() {
             @Override

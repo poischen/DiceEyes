@@ -4,12 +4,13 @@
     <string name="title_activity_photo_review_transfer">Photo review</string>
 
     <!-- Start activity -->
-    <string name="main_hello">Hello!</string>
+    <string name="main_hello">Hello</string>
     <string name="main_tellUrName">Please choose your study alias:</string>
     <string name="waiting">Waiting for input...</string>
     <string name="main_ready">App is ready.</string>
     <string name="setins_name_spinner_choose">Choose alias...</string>
     <string-array name="settings_name_spinnerentries">
+        <item></item>
         <item>AdlerBerlin</item>
         <item>Beefeater</item>
         <item>BombayEast</item>
@@ -37,6 +38,7 @@
     <string name="menu_item_review">Review &amp; transfer</string>
     <string name="menu_item_permissions">Permissions</string>
     <string name="menu_item_log">Contact</string>
+    <string name="menu_item_delete">Delete</string>
 
     <!-- Errors -->
     <string name="error_try_again">Sth. did not work. Please try again.</string>
@@ -56,7 +58,7 @@
     <string name="gazegrid_toast_ok">Thanks!</string>
     <string name="main_toast_alias_set">Alias set to </string>
     <string name="main_alertdialog_title">Override alias</string>
-    <string name="main_alertdialog_content1">Do you want to replace alias </string>
+    <string name="main_alertdialog_content1">Do you want to replace alias</string>
     <string name="main_alertdialog_content2"> with </string>
     <string name="main_alertdialog_content3">\?</string>
     <string name="main_alertdialog_buttonok">Yup</string>
@@ -79,7 +81,6 @@
     <!-- Intent communication -->
     <string name="extra_requestid">requestID</string>
     <string name="extra_photoName">photoName</string>
-    <string name="extra_capturingevent">CapturingEvent</string>
     <string name="extra_capturingevent_init">init</string>
     <string name="extra_capturingevent_normal">normal</string>
     <string name="extra_datacollection_command">command</string>

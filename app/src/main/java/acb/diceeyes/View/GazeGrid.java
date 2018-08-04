@@ -2,6 +2,7 @@ package acb.diceeyes.View;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -79,8 +80,8 @@ public class GazeGrid extends AppCompatActivity {
 
         //start taking the picture, the CapurePicService will run the DataCollection when it is finished taking the pic
         Intent capturePhotoServiceIntent = new Intent(this, CapturePhotoService.class);
-        capturePhotoServiceIntent.putExtra(getString(R.string.extra_capturingevent), getString(R.string.extra_capturingevent_normal));
-        capturePhotoServiceIntent.putExtra(getString(R.string.extra_capturingevent), photoName);
+        capturePhotoServiceIntent.putExtra(getString(R.string.extra_datacollection_command), getString(R.string.extra_capturingevent_normal));
+        capturePhotoServiceIntent.putExtra(getString(R.string.extra_datacollection_command), photoName);
         capturePhotoServiceIntent.putExtra(DataCollectionService.GAZEPOINTPOSITION, gazePointPosition);
         startService(capturePhotoServiceIntent);
         Log.v(TAG, "CapturePhotoService will be started now");
@@ -100,7 +101,6 @@ public class GazeGrid extends AppCompatActivity {
                 Toast.makeText(GazeGrid.this, R.string.gazegrid_toast_ok, Toast.LENGTH_SHORT).show();
                 markInDB("valid");
                 storage.setPhotoWasTaken(period, true);
-                storage.setNextGazePoint();
                 finish();
             }
         });
@@ -108,7 +108,6 @@ public class GazeGrid extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 markInDB("nonvalid");
-                storage.setNextGazePoint();
                 finish();
             }
         });
@@ -119,7 +118,7 @@ public class GazeGrid extends AppCompatActivity {
     public void markInDB(String value){
             Intent dataCollectionIntent = new Intent(getApplicationContext(), DataCollectionService.class);
             dataCollectionIntent.putExtra(DataCollectionService.PICTURENAME, photoName);
-            dataCollectionIntent.putExtra(getString(R.string.extra_capturingevent), (R.string.extra_datacollection_command));
+            dataCollectionIntent.putExtra(getString(R.string.extra_datacollection_command), DataCollectionService.COMMAND_UPDATE);
             dataCollectionIntent.putExtra(DataCollectionService.PICTUREVALUE, value);
             getApplicationContext().startService(dataCollectionIntent);
     }
