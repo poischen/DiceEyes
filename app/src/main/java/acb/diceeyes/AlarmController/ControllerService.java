@@ -31,7 +31,7 @@ public class ControllerService extends Service implements Observer {
     private static final String TAG = ControllerService.class.getSimpleName();
 
     public static Storage storage;
-    private String capturingEvent = String.valueOf(R.string.extra_capturingevent_normal);
+    private String capturingEvent = getString(R.string.extra_capturingevent_normal);
 
     private boolean firstTrySuccessfullyFlag;
     private boolean isScreenActive = true;
@@ -59,9 +59,9 @@ public class ControllerService extends Service implements Observer {
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             storage = new Storage(getApplicationContext());
-            capturingEvent = String.valueOf(R.string.extra_capturingevent_init);
+            capturingEvent = getString(R.string.extra_capturingevent_init);
             startCapturePictureService();
-            capturingEvent = String.valueOf(R.string.extra_capturingevent_normal);
+            capturingEvent = getString(R.string.extra_capturingevent_normal);
             String storagePath = storage.getStoragePath();
             String userAlias = storage.getAlias();
             firstTrySuccessfullyFlag = true;
@@ -83,8 +83,8 @@ public class ControllerService extends Service implements Observer {
 
             // Notification about starting the controller service foreground according to the design guidelines
             Notification notification = new Notification.Builder(getApplicationContext())
-                    .setContentTitle(String.valueOf(R.string.notifications_title))
-                    .setContentText(String.valueOf(R.string.notifications_generic))
+                    .setContentTitle(getString(R.string.notifications_title))
+                    .setContentText(getString(R.string.notifications_generic))
                     .setSmallIcon(R.drawable.dice)
                     .build();
             startForeground(getResources().getInteger(R.integer.notification_id_service_running), notification);
@@ -233,8 +233,8 @@ public class ControllerService extends Service implements Observer {
                 if (isScreenActive) {
                     //start GazeGrid
                     Intent intent = new Intent(this, GazeGrid.class);
-                    intent.putExtra(String.valueOf(R.string.extra_period), ObservableObject.getInstance().getPeriod());
-                    intent.putExtra(String.valueOf(GazeGrid.GAZEPOINTPOSITION), storage.getGazePoint());
+                    intent.putExtra(getString(R.string.extra_period), ObservableObject.getInstance().getPeriod());
+                    intent.putExtra(GazeGrid.GAZEPOINTPOSITION, storage.getGazePoint());
                     startActivity(intent);
                 }
             }
@@ -333,7 +333,7 @@ public class ControllerService extends Service implements Observer {
         //create Intent and store in case of need to cancel the alarm
         Intent intent = new Intent(this, PhotoAlarmReceiver.class);
         intent.setAction("acb.diceeyes.AlarmController.PhotoAlarmReceiver");
-        intent.putExtra(String.valueOf(R.string.extra_period), period);
+        intent.putExtra(getString(R.string.extra_period), period);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), requestIdCounter, intent, PendingIntent.FLAG_ONE_SHOT);
         requestIdCounter++;
         pendingIntentArray.add(pendingIntent);
@@ -390,7 +390,7 @@ public class ControllerService extends Service implements Observer {
 
     private boolean startCapturePictureService() {
         Intent capturePicServiceIntent = new Intent(this, CapturePhotoService.class);
-        capturePicServiceIntent.putExtra(String.valueOf(R.string.extra_capturingevent), capturingEvent);
+        capturePicServiceIntent.putExtra(getString(R.string.extra_capturingevent), capturingEvent);
         getApplicationContext().startService(capturePicServiceIntent);
         Log.v(TAG, "CapturePicService will be started now");
         return true;

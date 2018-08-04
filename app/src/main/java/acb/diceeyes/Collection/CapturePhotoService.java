@@ -55,8 +55,8 @@ public class CapturePhotoService extends Service {
             surfaceTexture = new SurfaceTexture(0);
             camera.setPreviewTexture(surfaceTexture);
 
-            event = (String) intent.getExtras().get(String.valueOf(R.string.extra_capturingevent_normal));
-            photoName = (String) intent.getExtras().get(String.valueOf(R.string.extra_photoName));
+            event = (String) intent.getExtras().get(getString(R.string.extra_capturingevent_normal));
+            photoName = (String) intent.getExtras().get(getString(R.string.extra_photoName));
 
             capturePhoto();
 
@@ -201,7 +201,7 @@ public class CapturePhotoService extends Service {
     public void startDataCollectionService() {
         Intent dataCollectionIntent = new Intent(getApplicationContext(), DataCollectionService.class);
             dataCollectionIntent.putExtra(DataCollectionService.PICTURENAME, photoName);
-            dataCollectionIntent.putExtra(String.valueOf(R.string.extra_capturingevent), event);
+            dataCollectionIntent.putExtra(getString(R.string.extra_capturingevent), event);
         getApplicationContext().startService(dataCollectionIntent);
     }
 

@@ -25,8 +25,8 @@ public class TransferReminderAlarmReceiver extends BroadcastReceiver {
         NotificationCompat.Builder reviewNotificationBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.dice)
-                        .setContentTitle(String.valueOf(R.string.app_name))
-                        .setContentText(String.valueOf(R.string.notifications_datatransfer))
+                        .setContentTitle(context.getResources().getString(R.string.app_name))
+                        .setContentText(context.getResources().getString(R.string.notifications_datatransfer))
                         .setOngoing(true);
 
         reviewNotificationBuilder.setLights(Color.rgb(230, 74, 25), 2500, 3000);

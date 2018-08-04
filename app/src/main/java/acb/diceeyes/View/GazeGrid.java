@@ -54,7 +54,7 @@ public class GazeGrid extends AppCompatActivity {
             Bundle extras = getIntent().getExtras();
             if (extras != null) {
                 gazePointPosition = extras.getInt(GAZEPOINTPOSITION);
-                period = extras.getInt(String.valueOf(R.string.extra_period));
+                period = extras.getInt(getString(R.string.extra_period));
             }
         } catch (Exception e) {
             gazePointPosition = 0;
@@ -73,14 +73,14 @@ public class GazeGrid extends AppCompatActivity {
 
     private void startCapturePhotoService() {
         //create photo name
-        DateFormat dateFormat = new SimpleDateFormat(String.valueOf(R.string.global_date_pattern));
+        DateFormat dateFormat = new SimpleDateFormat(getString(R.string.global_date_pattern));
         String timeString = dateFormat.format(new Date());
-        photoName = storage.getAlias() + "_" + timeString + String.valueOf(R.string.global_photofile_format);
+        photoName = storage.getAlias() + "_" + timeString + getString(R.string.global_photofile_format);
 
         //start taking the picture, the CapurePicService will run the DataCollection when it is finished taking the pic
         Intent capturePhotoServiceIntent = new Intent(this, CapturePhotoService.class);
-        capturePhotoServiceIntent.putExtra(String.valueOf(R.string.extra_capturingevent), String.valueOf(R.string.extra_capturingevent_normal));
-        capturePhotoServiceIntent.putExtra(String.valueOf(R.string.extra_capturingevent), photoName);
+        capturePhotoServiceIntent.putExtra(getString(R.string.extra_capturingevent), getString(R.string.extra_capturingevent_normal));
+        capturePhotoServiceIntent.putExtra(getString(R.string.extra_capturingevent), photoName);
         capturePhotoServiceIntent.putExtra(DataCollectionService.GAZEPOINTPOSITION, gazePointPosition);
         startService(capturePhotoServiceIntent);
         Log.v(TAG, "CapturePhotoService will be started now");
@@ -119,8 +119,8 @@ public class GazeGrid extends AppCompatActivity {
     public void markInDB(String value){
             Intent dataCollectionIntent = new Intent(getApplicationContext(), DataCollectionService.class);
             dataCollectionIntent.putExtra(DataCollectionService.PICTURENAME, photoName);
-            dataCollectionIntent.putExtra(String.valueOf(R.string.extra_capturingevent), (R.string.extra_datacollection_command));
-            dataCollectionIntent.putExtra(String.valueOf(DataCollectionService.PICTUREVALUE), value);
+            dataCollectionIntent.putExtra(getString(R.string.extra_capturingevent), (R.string.extra_datacollection_command));
+            dataCollectionIntent.putExtra(DataCollectionService.PICTUREVALUE, value);
             getApplicationContext().startService(dataCollectionIntent);
     }
 

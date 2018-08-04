@@ -310,7 +310,7 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            DateFormat dateFormat = new SimpleDateFormat(String.valueOf(R.string.global_date_pattern));
+            DateFormat dateFormat = new SimpleDateFormat(getString(R.string.global_date_pattern));
             String time = dateFormat.format(new Date());
 
             try {

@@ -119,7 +119,7 @@ public class DataCollectionService extends Service implements LocationListener, 
         String capturingEvent = "";
 
         try {
-            command = (String) intent.getExtras().get(String.valueOf(R.string.extra_datacollection_command));
+            command = (String) intent.getExtras().get(getString(R.string.extra_datacollection_command));
         } catch (Exception e) {
             Log.v(TAG, "onStartCommand intent null");
         }
@@ -132,7 +132,7 @@ public class DataCollectionService extends Service implements LocationListener, 
 
         switch (command) {
             case COMMAND_UPDATE:
-                String value = (String) intent.getExtras().get(String.valueOf(PICTUREVALUE));
+                String value = (String) intent.getExtras().get(PICTUREVALUE);
 
                 storage = new Storage(getApplicationContext());
                 database = storage.getWritableDatabase();
@@ -151,13 +151,13 @@ public class DataCollectionService extends Service implements LocationListener, 
             default:
                 try {
                     gazePoint = (int) intent.getExtras().get(GAZEPOINTPOSITION);
-                    capturingEvent = (String) intent.getExtras().get(String.valueOf(R.string.extra_capturingevent));
+                    capturingEvent = (String) intent.getExtras().get(getString(R.string.extra_capturingevent));
                     Log.v(TAG, "gazePoint int onStartCommand: " + gazePoint);
                 } catch (Exception e) {
                     Log.v(TAG, "onStartCommand intent null");
                 }
 
-                if (capturingEvent.equals(String.valueOf(R.string.extra_capturingevent_normal)) || capturingEvent.equals(null)) {
+                if (capturingEvent.equals(getString(R.string.extra_capturingevent_normal)) || capturingEvent.equals(null)) {
                     //Read and store current data-----------------------------------------------------------
                     //photo name--------------------------------------------------------------------------
                     cv.put(Storage.COLUMN_PHOTO, photoName);

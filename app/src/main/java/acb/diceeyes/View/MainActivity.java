@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 if (storage.isServiceRunning(getApplicationContext(), ControllerService.class.getName())){
-                    Toast.makeText(MainActivity.this, String.valueOf(R.string.error_error_alreadyrunning), Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, getString(R.string.error_error_alreadyrunning), Toast.LENGTH_LONG).show();
                 } else if (storage.getAlias() == null){
                     storeAlias(aliasSpinner.getSelectedItem().toString());
                 } else if (storage.getAlias() != null){
@@ -147,12 +147,12 @@ public class MainActivity extends AppCompatActivity {
                 logFile.mkdirs();
             }
 
-            DateFormat dateFormat = new SimpleDateFormat(String.valueOf(R.string.global_date_pattern));
+            DateFormat dateFormat = new SimpleDateFormat(getString(R.string.global_date_pattern));
             String timeString = dateFormat.format(new Date());
-            String test = String.valueOf(R.string.log_file_filename);
+            String test = getString(R.string.log_file_filename);
 
             path = File.separator
-                    + storage.getAlias() + String.valueOf(R.string.log_file_filename) + timeString + String.valueOf(R.string.log_file_filespec);
+                    + storage.getAlias() + getString(R.string.log_file_filename) + timeString + getString(R.string.log_file_filespec);
             Runtime.getRuntime().exec(
                     "logcat  -d -f " + logFile + path);
         } catch (IOException e) {
@@ -168,17 +168,17 @@ public class MainActivity extends AppCompatActivity {
         Intent mailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
         mailIntent.setFlags(FLAG_ACTIVITY_NEW_TASK);
         mailIntent.setType("text/plain");
-        mailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{String.valueOf(R.string.log_mail_address)});
-        mailIntent.putExtra(Intent.EXTRA_SUBJECT, String.valueOf(R.string.log_mail_subject) + storage.getAlias());
+        mailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{getString(R.string.log_mail_address)});
+        mailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.log_mail_subject) + storage.getAlias());
         ArrayList<CharSequence> text = new ArrayList<CharSequence>();
-        text.add(String.valueOf(R.string.log_mail_msg));
+        text.add(getString(R.string.log_mail_msg));
         mailIntent.putExtra(Intent.EXTRA_TEXT, text);
         ArrayList<Uri> uris = new ArrayList<Uri>();
         File logfile = new File(createLogcat());
         Uri u = Uri.fromFile(logfile);
         uris.add(u);
         mailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
-        Intent shareIntent = Intent.createChooser(mailIntent, String.valueOf(R.string.log_mail_intent_title));
+        Intent shareIntent = Intent.createChooser(mailIntent, getString(R.string.log_mail_intent_title));
         shareIntent.setFlags(FLAG_ACTIVITY_NEW_TASK);
         getApplicationContext().startActivity(shareIntent);
     }
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
             Intent controllerIntent = new Intent(this, ControllerService.class);
             getApplicationContext().startService(controllerIntent);
         } else {
-            Toast.makeText(this, String.valueOf(R.string.error_missing_alias), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.error_missing_alias), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -213,11 +213,11 @@ public class MainActivity extends AppCompatActivity {
             }
             storage.setAlias(getApplicationContext(), input, index);
             Log.v(TAG, "Study alias read: " + input);
-            Toast.makeText(this, String.valueOf(R.string.main_toast_alias_set) + input, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.main_toast_alias_set) + input, Toast.LENGTH_SHORT).show();
             aliasAlreadySet();
             Log.v(TAG, "Study alias successfully stored:" + input);
         } catch (NullPointerException e) {
-            Toast.makeText(this, String.valueOf(R.string.error_try_again), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.error_try_again), Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Study user name not stored.");
         }
 
@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
     private void aliasAlreadySet() {
         String alias = storage.getAlias();
         aliasSpinner.setSelection(storage.getAliasIndex());
-        hellotv.setText(String.valueOf(R.string.main_hello) + " " + alias + "!");
+        hellotv.setText(getString(R.string.main_hello) + " " + alias + "!");
         chooseAliasHLtv.setEnabled(false);
         startStopButton.setEnabled(true);
 
@@ -244,16 +244,16 @@ public class MainActivity extends AppCompatActivity {
     private void showConfirmation(){
         final String newAlias = aliasSpinner.getSelectedItem().toString();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(String.valueOf(R.string.main_alertdialog_title));
-        builder.setMessage(String.valueOf(R.string.main_alertdialog_content1) + storage.getAlias() + String.valueOf(R.string.main_alertdialog_content2) + newAlias + String.valueOf(R.string.main_alertdialog_content3));
+        builder.setTitle(getString(R.string.main_alertdialog_title));
+        builder.setMessage(getString(R.string.main_alertdialog_content1) + storage.getAlias() + getString(R.string.main_alertdialog_content2) + newAlias + getString(R.string.main_alertdialog_content3));
 
-        builder.setPositiveButton(String.valueOf(R.string.main_alertdialog_buttonok), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getString(R.string.main_alertdialog_buttonok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 storeAlias(newAlias);
             }
         });
-        builder.setNegativeButton(String.valueOf(R.string.main_alertdialog_buttonredo), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getString(R.string.main_alertdialog_buttonredo), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
             }
