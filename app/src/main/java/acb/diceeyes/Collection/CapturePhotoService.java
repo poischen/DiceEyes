@@ -55,7 +55,8 @@ public class CapturePhotoService extends Service {
             surfaceTexture = new SurfaceTexture(0);
             camera.setPreviewTexture(surfaceTexture);
 
-            event = (String) intent.getExtras().get(String.valueOf(R.string.extra_capturingevent));
+            event = (String) intent.getExtras().get(String.valueOf(R.string.extra_capturingevent_normal));
+            photoName = (String) intent.getExtras().get(String.valueOf(R.string.extra_photoName));
 
             capturePhoto();
 
@@ -135,14 +136,7 @@ public class CapturePhotoService extends Service {
         }
     }
 
-
-    public void setPhotoName(String name) {
-        this.photoName = name;
-    }
-
     public class CameraPictureCallback implements Camera.PictureCallback {
-
-        private String pictureName;
         private CapturePhotoService cps;
 
         public CameraPictureCallback (CapturePhotoService cps){
@@ -199,10 +193,7 @@ public class CapturePhotoService extends Service {
             Log.v(TAG, "getOutputMediaFile() called.");
             File filePath = new File(storagePath);
             Log.v(TAG, "File created.");
-            DateFormat dateFormat = new SimpleDateFormat(String.valueOf(R.string.global_date_pattern));
-            String timeString = dateFormat.format(new Date());
-            photoName = userName + "_" + timeString + String.valueOf(R.string.global_photofile_format);
-            return new File(filePath.getPath() + File.separator + pictureName);
+            return new File(filePath.getPath() + File.separator + photoName);
         }
 
     }

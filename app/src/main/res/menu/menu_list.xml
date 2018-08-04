@@ -3,10 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_item_settings"
-        android:title="@string/menu_item_settings"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/menu_item_permissions"
         android:title="@string/menu_item_permissions"
         app:showAsAction="never" />
@@ -14,5 +10,10 @@
         android:id="@+id/menu_item_log"
         android:title="@string/menu_item_log"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_item_review"
+        android:title="@string/menu_item_review"
+        app:showAsAction="never" />
+
 
 </menu>

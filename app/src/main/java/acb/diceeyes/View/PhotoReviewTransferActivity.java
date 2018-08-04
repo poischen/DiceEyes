@@ -74,7 +74,6 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_review_transfer);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        //initDropboxSession();
         NotificationManager notificationManager =
                 (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(R.integer.notification_id_reminderdatatransfer);

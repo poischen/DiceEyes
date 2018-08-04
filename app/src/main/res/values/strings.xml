@@ -1,9 +1,40 @@
 <resources>
     <string name="app_name">DiceEyes</string>
     <string name="title_activity_gaze_grid"></string>
+    <string name="title_activity_photo_review_transfer">Photo review</string>
+
+    <!-- Start activity -->
+    <string name="main_hello">Hello!</string>
+    <string name="main_tellUrName">Please choose your study alias:</string>
+    <string name="waiting">Waiting for input...</string>
+    <string name="main_ready">App is ready.</string>
+    <string name="setins_name_spinner_choose">Choose alias...</string>
+    <string-array name="settings_name_spinnerentries">
+        <item>AdlerBerlin</item>
+        <item>Beefeater</item>
+        <item>BombayEast</item>
+        <item>Brandstifter</item>
+        <item>Bulldog</item>
+        <item>Duke</item>
+        <item>Elephant</item>
+        <item>Feel</item>
+        <item>Ferdinand</item>
+        <item>Granit</item>
+        <item>Hendricks</item>
+        <item>Horestown</item>
+        <item>London</item>
+        <item>Mare</item>
+        <item>Mombasa</item>
+        <item>Monkey</item>
+        <item>Saffron</item>
+        <item>Siegfried</item>
+        <item>Sul</item>
+        <item>Tanqueray</item>
+    </string-array>
+
 
     <!-- Menu -->
-    <string name="menu_item_settings">Settings</string>
+    <string name="menu_item_review">Review &amp; transfer</string>
     <string name="menu_item_permissions">Permissions</string>
     <string name="menu_item_log">Contact</string>
 
@@ -11,14 +42,8 @@
     <string name="error_try_again">Sth. did not work. Please try again.</string>
     <string name="error_create_table">Could not create table.</string>
     <string name="error_sercive_not_running">ControllerService is not running.</string>
-
-    <!-- Logfile and contact -->
-    <string name="log_file_filename">_logcat_</string>
-    <string name="log_file_filespec">.txt</string>
-    <string name="log_mail_address">anita.baier@campus.lmu.de</string>
-    <string name="log_mail_subject">logfile of</string>
-    <string name="log_mail_msg">Please find attached the latest logfile.</string>
-    <string name="log_mail_intent_title">Send mail...</string>
+    <string name="error_error_alreadyrunning">Please stop service before changing user alias.</string>
+    <string name="error_missing_alias">Store an alias first.</string>
 
     <!-- Miscsm, toats and globals -->
     <string name="global_date_pattern">dd-MM-yy_HH-mm-ss</string>
@@ -29,14 +54,31 @@
     <string name="gazegrid_alertdialog_buttonok">Yes</string>
     <string name="gazegrid_alertdialog_buttonredo">Nope</string>
     <string name="gazegrid_toast_ok">Thanks!</string>
+    <string name="main_toast_alias_set">Alias set to </string>
+    <string name="main_alertdialog_title">Override alias</string>
+    <string name="main_alertdialog_content1">Do you want to replace alias </string>
+    <string name="main_alertdialog_content2"> with </string>
+    <string name="main_alertdialog_content3">\?</string>
+    <string name="main_alertdialog_buttonok">Yup</string>
+    <string name="main_alertdialog_buttonredo">Nah!</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Dice Eyes</string>
     <string name="notifications_generic">Service is running. Thanks for participating :)</string>
     <string name="notifications_datatransfer">Please transfer data if possible</string>
 
+
+    <!-- Logfile and contact -->
+    <string name="log_file_filename">_logcat_</string>
+    <string name="log_file_filespec">.txt</string>
+    <string name="log_mail_address">anita.baier@campus.lmu.de</string>
+    <string name="log_mail_subject">logfile of</string>
+    <string name="log_mail_msg">Please find attached the latest logfile.</string>
+    <string name="log_mail_intent_title">Send mail...</string>
+
     <!-- Intent communication -->
     <string name="extra_requestid">requestID</string>
+    <string name="extra_photoName">photoName</string>
     <string name="extra_capturingevent">CapturingEvent</string>
     <string name="extra_capturingevent_init">init</string>
     <string name="extra_capturingevent_normal">normal</string>
@@ -66,33 +108,5 @@
     <integer name="alarm_period_19">20</integer>
     <integer name="alarm_period_20">205</integer>
 
-    <!-- Settings -->
-    <string name="settings_name">Study alias</string>
-    <string name="settings_permissions">Permissions</string>
-    <string name="settings_name_hl">Choose your study alias:</string>
-    <string-array name="settings_name_spinnerentries">
-        <item>select...</item>
-        <item>AdlerBerlin</item>
-        <item>Beefeater</item>
-        <item>BombayEast</item>
-        <item>Brandstifter</item>
-        <item>Bulldog</item>
-        <item>Duke</item>
-        <item>Elephant</item>
-        <item>Feel</item>
-        <item>Ferdinand</item>
-        <item>Granit</item>
-        <item>Hendricks</item>
-        <item>Horestown</item>
-        <item>London</item>
-        <item>Mare</item>
-        <item>Mombasa</item>
-        <item>Monkey</item>
-        <item>Saffron</item>
-        <item>Siegfried</item>
-        <item>Sul</item>
-        <item>Tanqueray</item>
-    </string-array>
-    <string name="title_activity_photo_review_transfer">PhotoReviewTransferActivity</string>
 
 </resources>

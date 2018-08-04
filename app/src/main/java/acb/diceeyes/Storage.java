@@ -50,6 +50,7 @@ public class Storage extends SQLiteOpenHelper {
     public static final String COLUMN_LOCATIONROAD = "LocationRoad";
     public static final String COLUMN_LOCATIONPOSTALCODE = "LocationPLZ";
     public static final String COLUMN_GAZEPOINT = "gazepoint";
+    public static final String COLUMN_VALID = "validity";
 
     public static final String storage_user_pref = "Alias Storage";
     public static final String storage_user_name = "Alias";
@@ -77,7 +78,8 @@ public class Storage extends SQLiteOpenHelper {
                     COLUMN_ORIENTATION + " TEXT, " +
                     COLUMN_BATTERYSTATUS + " TEXT, " +
                     COLUMN_BATTERYLEVEL + " INTEGER, " +
-                    COLUMN_GAZEPOINT + " TEXT);";
+                    COLUMN_GAZEPOINT + " TEXT " +
+                    COLUMN_VALID + " TEXT);";
 
 
 

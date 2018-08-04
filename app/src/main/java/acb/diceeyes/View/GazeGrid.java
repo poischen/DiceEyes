@@ -12,6 +12,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import acb.diceeyes.R;
 import acb.diceeyes.Storage;
 import acb.diceeyes.Collection.*;
@@ -25,6 +29,7 @@ public class GazeGrid extends AppCompatActivity {
     private int gazePointPosition;
     public static String GAZEPOINTPOSITION;
     public int period = 0;
+    private String photoName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +72,15 @@ public class GazeGrid extends AppCompatActivity {
     }
 
     private void startCapturePhotoService() {
+        //create photo name
+        DateFormat dateFormat = new SimpleDateFormat(String.valueOf(R.string.global_date_pattern));
+        String timeString = dateFormat.format(new Date());
+        photoName = storage.getAlias() + "_" + timeString + String.valueOf(R.string.global_photofile_format);
+
         //start taking the picture, the CapurePicService will run the DataCollection when it is finished taking the pic
         Intent capturePhotoServiceIntent = new Intent(this, CapturePhotoService.class);
         capturePhotoServiceIntent.putExtra(String.valueOf(R.string.extra_capturingevent), String.valueOf(R.string.extra_capturingevent_normal));
+        capturePhotoServiceIntent.putExtra(String.valueOf(R.string.extra_capturingevent), photoName);
         capturePhotoServiceIntent.putExtra(DataCollectionService.GAZEPOINTPOSITION, gazePointPosition);
         startService(capturePhotoServiceIntent);
         Log.v(TAG, "CapturePhotoService will be started now");
@@ -87,7 +98,7 @@ public class GazeGrid extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(GazeGrid.this, R.string.gazegrid_toast_ok, Toast.LENGTH_SHORT).show();
-                //TODO: mark as valid in db
+                markInDB("valid");
                 storage.setPhotoWasTaken(period, true);
                 storage.setNextGazePoint();
                 finish();
@@ -96,13 +107,21 @@ public class GazeGrid extends AppCompatActivity {
         builder.setNegativeButton(R.string.gazegrid_alertdialog_buttonredo, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //TODO: mark as non valid in db
+                markInDB("nonvalid");
                 storage.setNextGazePoint();
                 finish();
             }
         });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public void markInDB(String value){
+            Intent dataCollectionIntent = new Intent(getApplicationContext(), DataCollectionService.class);
+            dataCollectionIntent.putExtra(DataCollectionService.PICTURENAME, photoName);
+            dataCollectionIntent.putExtra(String.valueOf(R.string.extra_capturingevent), (R.string.extra_datacollection_command));
+            dataCollectionIntent.putExtra(String.valueOf(DataCollectionService.PICTUREVALUE), value);
+            getApplicationContext().startService(dataCollectionIntent);
     }
 
     class GridViewGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -112,7 +131,6 @@ public class GazeGrid extends AppCompatActivity {
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
             Toast.makeText(GazeGrid.this, R.string.toast_rescheduled, Toast.LENGTH_SHORT).show();
-            //TODO: reschedule trigger
             finish();
             return true;
         }

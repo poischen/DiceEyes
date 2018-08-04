@@ -41,11 +41,13 @@ public class DataCollectionService extends Service implements LocationListener, 
     public static final String NASTRING = "n./a.";
     public static final int NAINT = -11;
     public static final String PICTURENAME = "pictureName";
+    public static final String PICTUREVALUE = "pictureValue";
     public static final String PORTAIT = "portrait";
     public static final String LANDSCAPE = "landscape";
     public static final String GAZEPOINTPOSITION = "gazePointPosition";
     public static final String COMMAND_REGISTER = "register";
     public static final String COMMAND_UNREGISTER = "unregister";
+    public static final String COMMAND_UPDATE = "update";
 
     private static final String TAG = DataCollectionService.class.getSimpleName();
     String accelerometerSensor = NASTRING;
@@ -69,8 +71,9 @@ public class DataCollectionService extends Service implements LocationListener, 
     String batteryStatus = NASTRING;
     int batteryLevel = NAINT;
     int gazePoint = NAINT;
+    String pictureValidity = "";
     private SQLiteDatabase database;
-    private Storage storage = ControllerService.storage;
+    private Storage storage;
     private SensorManager sensorManager;
     private LocationManager locationManager;
     private Location latestLocation;
@@ -116,13 +119,29 @@ public class DataCollectionService extends Service implements LocationListener, 
         String capturingEvent = "";
 
         try {
-            //TODO: stimmt das?
             command = (String) intent.getExtras().get(String.valueOf(R.string.extra_datacollection_command));
         } catch (Exception e) {
             Log.v(TAG, "onStartCommand intent null");
         }
 
+        try {
+            photoName = (String) intent.getExtras().get(PICTURENAME);
+        } catch (NullPointerException e) {
+            Log.v(TAG, "photoName was null");
+        }
+
         switch (command) {
+            case COMMAND_UPDATE:
+                String value = (String) intent.getExtras().get(String.valueOf(PICTUREVALUE));
+
+                storage = new Storage(getApplicationContext());
+                database = storage.getWritableDatabase();
+                String updateSQL = "UPDATE " + Storage.DB_TABLE + " SET " + Storage.COLUMN_VALID + " = " + value + " WHERE " + Storage.COLUMN_PHOTO + " = " + photoName;
+                database.execSQL(updateSQL);
+                Log.v(TAG, "db udpate string " + updateSQL);
+                Log.v(TAG, "validity update");
+                database.close();
+                break;
             case COMMAND_REGISTER:
                 registerListener();
                 break;
@@ -131,7 +150,6 @@ public class DataCollectionService extends Service implements LocationListener, 
                 break;
             default:
                 try {
-                    //TODO: stimmt das?
                     gazePoint = (int) intent.getExtras().get(GAZEPOINTPOSITION);
                     capturingEvent = (String) intent.getExtras().get(String.valueOf(R.string.extra_capturingevent));
                     Log.v(TAG, "gazePoint int onStartCommand: " + gazePoint);
@@ -141,12 +159,7 @@ public class DataCollectionService extends Service implements LocationListener, 
 
                 if (capturingEvent.equals(String.valueOf(R.string.extra_capturingevent_normal)) || capturingEvent.equals(null)) {
                     //Read and store current data-----------------------------------------------------------
-                    //picture name--------------------------------------------------------------------------
-                    try {
-                        photoName = (String) intent.getExtras().get(PICTURENAME);
-                    } catch (NullPointerException e) {
-                        Log.v(TAG, "photoName was null");
-                    }
+                    //photo name--------------------------------------------------------------------------
                     cv.put(Storage.COLUMN_PHOTO, photoName);
                     Log.v(TAG, "photoName" + photoName);
 
@@ -240,6 +253,7 @@ public class DataCollectionService extends Service implements LocationListener, 
 
                     //gazepoint----------------------------------------------------------------
                     cv.put(Storage.COLUMN_GAZEPOINT, gazePoint);
+                    cv.put(Storage.COLUMN_VALID, "");
                     Log.v(TAG, "gaze Point: " + gazePoint);
 
                 } else {//read general sensor information and store to db---------------------------------------
@@ -329,8 +343,9 @@ public class DataCollectionService extends Service implements LocationListener, 
                     cv.put(Storage.COLUMN_BATTERYLEVEL, batteryLevel);
                     Log.v(TAG, "batteryLevel: " + batteryLevel);
 
-                    //gazepoint----------------------------------------------------------------
+                    //gazepoint & valitidy----------------------------------------------------------------
                     cv.put(Storage.COLUMN_GAZEPOINT, gazePoint);
+                    cv.put(Storage.COLUMN_VALID, "");
                     Log.v(TAG, "gaze Point: " + gazePoint);
 
                     Log.v(TAG, "VALUES " + cv.toString());
@@ -339,7 +354,7 @@ public class DataCollectionService extends Service implements LocationListener, 
         //write data to database--------------------------------------------------------------------
         storage = new Storage(getApplicationContext());
         database = storage.getWritableDatabase();
-        long insertId = database.insert(Storage.DB_TABLE, null, cv);
+        long insertIdWrite = database.insert(Storage.DB_TABLE, null, cv);
         Log.v(TAG, "data stored to db");
         database.close();
 
@@ -432,7 +447,6 @@ public class DataCollectionService extends Service implements LocationListener, 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // TODO Auto-generated method stub
-
     }
 
 
