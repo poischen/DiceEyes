@@ -3,18 +3,14 @@ package acb.diceeyes.View;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
@@ -81,6 +77,7 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_photo_review_transfer);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         NotificationManager notificationManager =
@@ -115,18 +112,19 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
                             sftpTask.execute();
                             connectProgressDialog.show();
                         }
-
-                AsyncTaskBuildGrid stbg = new AsyncTaskBuildGrid();
-                stbg.execute();
             }
         });
+
+        storage = new  Storage(getApplicationContext());
+
+        AsyncTaskBuildGrid stbg = new AsyncTaskBuildGrid();
+        stbg.execute();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_list, menu);
-        //deleteMenuItem = (MenuItem) menu.findItem(R.id.menu_item_delete);
+        inflater.inflate(R.menu.menu_ressource, menu);
         return true;
     }
 
@@ -169,13 +167,11 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
     @Override
     protected void onStart(){
         super.onStart();
-        storage = new  Storage(getApplicationContext());
 
         gridView = (GridView) findViewById(R.id.gridView);
         ArrayList<PhotoItem> dummy = new ArrayList<PhotoItem>();
         gridAdapter = new PhotoReviewGridViewAdapter(getApplicationContext(), R.layout.picture_review_grid_item, dummy);
         gridView.setAdapter(gridAdapter);
-
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -229,6 +225,7 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
 
     private void getData() {
         File folder = new File(storage.getStoragePath() + File.separator);
+        Log.v(TAG, "folder " + folder);
         File[] listOfFiles = folder.listFiles();
 
         try {
@@ -267,8 +264,6 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
                     Log.v(TAG, "Image: " + i + ": path: " + listOfFiles[i].getAbsolutePath());
                     String currentPath = listOfFiles[i].getAbsolutePath();
 
-                    //Bitmap currentPicture = BitmapFactory.decodeFile(listOfFiles[i].getAbsolutePath());
-
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inSampleSize = 7;
                     Bitmap currentPicture = BitmapFactory.decodeFile(listOfFiles[i].getAbsolutePath(),options);
@@ -293,12 +288,14 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
+            Log.v(TAG, "doInBackground");
             getData();
             return resp;
         }
 
         @Override
         protected void onPostExecute(String result) {
+            Log.v(TAG, "onPostExecute");
             gridAdapter.notifyDataSetChanged();
             progressBar.setVisibility(View.GONE);
         }

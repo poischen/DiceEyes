@@ -81,7 +81,7 @@ public class GazeGrid extends AppCompatActivity {
         //start taking the picture, the CapurePicService will run the DataCollection when it is finished taking the pic
         Intent capturePhotoServiceIntent = new Intent(this, CapturePhotoService.class);
         capturePhotoServiceIntent.putExtra(getString(R.string.extra_datacollection_command), getString(R.string.extra_capturingevent_normal));
-        capturePhotoServiceIntent.putExtra(getString(R.string.extra_datacollection_command), photoName);
+        capturePhotoServiceIntent.putExtra(getString(R.string.extra_photoName), photoName);
         capturePhotoServiceIntent.putExtra(DataCollectionService.GAZEPOINTPOSITION, gazePointPosition);
         startService(capturePhotoServiceIntent);
         Log.v(TAG, "CapturePhotoService will be started now");

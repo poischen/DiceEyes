@@ -1,6 +1,7 @@
 package acb.diceeyes.View;
 import android.content.Context;
 //import android.util.Log;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,6 @@ public class PhotoReviewGridViewAdapter extends ArrayAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-
         View row;
         ViewHolder holder;
 
@@ -48,6 +48,7 @@ public class PhotoReviewGridViewAdapter extends ArrayAdapter {
         row.setTag(holder);
 
         final PhotoItem item = data.get(position);
+        Log.v(TAG, "photo item " + item);
         holder.picture.setImageBitmap(item.getPicture());
         item.setImageView(holder.picture);
         item.setCheckbox(holder.deleteCheckbox);

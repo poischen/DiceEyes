@@ -59,8 +59,7 @@
 
         <activity
             android:name=".View.PhotoReviewTransferActivity"
-            android:label="@string/title_activity_photo_review_transfer"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="@string/title_activity_photo_review_transfer"></activity>
     </application>
 
 </manifest>

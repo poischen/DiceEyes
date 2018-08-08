@@ -201,6 +201,7 @@ public class Storage extends SQLiteOpenHelper {
     }
 
     public String getStoragePath(){
+        Log.v(TAG, "storage path " + STORAGEPATHIMG);
         return STORAGEPATHIMG;
     }
 
