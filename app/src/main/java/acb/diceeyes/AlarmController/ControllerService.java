@@ -5,10 +5,12 @@ Controlls when and how often photos are captures and holds all necessary informa
 it is realized as a foreground service so it won't be killed by Android and the participant has feedback, that the Service is still running
 */
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
@@ -39,6 +42,7 @@ public class ControllerService extends Service implements Observer {
 
     private AlarmManager alarmManager;
     private ScreenOnOffReceiver systemEventReceiver;
+    private ResetReceiver resetReceiver;
     private TransferReminderAlarmReceiver transferReminderAlarmReceiver;
     private PhotoAlarmReceiver photoAlarmReceiver;
 
@@ -49,7 +53,7 @@ public class ControllerService extends Service implements Observer {
         super();
     }
 
-   @Override
+    @Override
     public void onCreate() {
         super.onCreate();
         Log.v(TAG, "ControllerService created.");
@@ -75,6 +79,7 @@ public class ControllerService extends Service implements Observer {
         if (firstTrySuccessfullyFlag) {
             ObservableObject.getInstance().addObserver(this);
             setPhotoAndTransferAlarms();
+            setResetReceiver();
 
             //Register Broadcast Receiver for listening if the screen is on/off & if system was rebooted
             systemEventReceiver = new ScreenOnOffReceiver();
@@ -122,7 +127,7 @@ public class ControllerService extends Service implements Observer {
             alarmManager.setRepeating(AlarmManager.RTC, c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
        }*/
 
-   //set data transfer alarm
+        //set data transfer alarm
         IntentFilter dataTransferReminderFilter = new IntentFilter("acb.diceeyes.AlarmControll.TransferReminderAlarmReceiver");
         transferReminderAlarmReceiver = new TransferReminderAlarmReceiver();
         registerReceiver(transferReminderAlarmReceiver, dataTransferReminderFilter);
@@ -138,6 +143,22 @@ public class ControllerService extends Service implements Observer {
         alarmManager.setInexactRepeating(AlarmManager.RTC, c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
+    public void setResetReceiver() {
+        IntentFilter resetFilter = new IntentFilter("acb.diceeyes.AlarmControll.ResetReceiver");
+        resetReceiver = new ResetReceiver();
+        registerReceiver(resetReceiver, resetFilter);
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(System.currentTimeMillis());
+        c.set(Calendar.HOUR_OF_DAY, 23);
+        c.set(Calendar.MINUTE, 59);
+        c.set(Calendar.SECOND, 15);
+
+        Intent resetIntent = new Intent(this, ResetReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), getResources().getInteger(R.integer.id_intent_requestcode_reset), resetIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmManager.setInexactRepeating(AlarmManager.RTC, c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -148,7 +169,7 @@ public class ControllerService extends Service implements Observer {
                 unregisterReceiver(systemEventReceiver);
                 systemEventReceiver = null;
                 Log.v(TAG, "systemEventReceiver unregistered");
-            } catch (Exception e){
+            } catch (Exception e) {
                 Log.d(TAG, "systemEventReceiver could not be unregistered");
             }
 
@@ -158,7 +179,7 @@ public class ControllerService extends Service implements Observer {
                 unregisterReceiver(transferReminderAlarmReceiver);
                 transferReminderAlarmReceiver = null;
                 Log.v(TAG, "reminderAlarmReceiver unregistered");
-            } catch (Exception e){
+            } catch (Exception e) {
                 Log.d(TAG, "reminderAlarmReceiver could not be unregistered");
             }
 
@@ -168,7 +189,7 @@ public class ControllerService extends Service implements Observer {
                 unregisterReceiver(photoAlarmReceiver);
                 photoAlarmReceiver = null;
                 Log.v(TAG, "eventAlarmReceiver unregistered");
-            } catch (Exception e){
+            } catch (Exception e) {
                 Log.d(TAG, "eventAlarmReceiver could not be unregistered");
             }
         }
@@ -198,38 +219,40 @@ public class ControllerService extends Service implements Observer {
         }
 
         Log.v(TAG, "update action: " + action);
-         if (!(action.equals("empty"))) {
-             if (action.contains("android.intent.action.SCREEN_ON")) {
-                 isScreenActive = true;
+        if (!(action.equals("empty"))) {
+            if (action.contains("android.intent.action.SCREEN_ON")) {
 
-                 //check if in relevant time
-                 Calendar currentTime = Calendar.getInstance();
-                 currentTime.setTimeInMillis(System.currentTimeMillis());
-                 int hour = currentTime.get(Calendar.HOUR);
+                isScreenActive = true;
 
-                 if (hour > 7 && hour < 21){
-                     //check if it is necessary to take a picture in this period and set alarms if so
-                     int period = calculatePeriod();
-                     if (!wasAlreadyTakenInPeriod(period) && hour < 20){
-                         setGridAlarm(period);
-                     } else {
-                         //check if there were missed periods and set alarm
-                         int missedAlarms = checkMissedPeriods(calculatePeriod());
-                         if (missedAlarms > 0){
-                             setGridAlarm(0);
-                         }
-                     }
-                 } else {
-                     //reset counter at night
-                     requestIdCounter = 3;
-                 }
-             }
-             else if (action.contains("android.intent.action.SCREEN_OFF")) {
+                //check if in relevant time
+                Calendar currentTime = Calendar.getInstance();
+                currentTime.setTimeInMillis(System.currentTimeMillis());
+                int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+                Log.v(TAG, "screen is on, do things now" + hour);
+                if (hour > 7 && hour < 21) {
+                    //check if it is necessary to take a picture in this period and set alarms if so
+                    int period = calculatePeriod();
+                    Log.v(TAG, "calculated period: " + period);
+                    if (!wasAlreadyTakenInPeriod(period) && hour < 20) {
+                        Log.v(TAG, "pic has to be taken");
+                        setGridAlarm(period);
+                    } else {
+                        //check if there were missed periods and set alarm
+                        int missedAlarms = checkMissedPeriods(calculatePeriod());
+                        if (missedAlarms > 0) {
+                            Log.v(TAG, "missed alarm");
+                            setGridAlarm(0);
+                        }
+                    }
+                } else {
+                    //reset counter at night
+                    requestIdCounter = 3;
+                }
+            } else if (action.contains("android.intent.action.SCREEN_OFF")) {
                 Log.v(TAG, "screen was turned off, cancel future alarms");
                 isScreenActive = false;
                 handleScreenOff();
-            }
-            else if (action.contains("PhotoAlarmReceiver")) {
+            } else if (action.contains("PhotoAlarmReceiver")) {
                 Log.v(TAG, "Photo Alarm triggers capturing photo");
                 if (isScreenActive) {
                     //start GazeGrid
@@ -243,13 +266,14 @@ public class ControllerService extends Service implements Observer {
         }
     }
 
-    private boolean wasAlreadyTakenInPeriod(int period){
+    private boolean wasAlreadyTakenInPeriod(int period) {
         return storage.getPhotoWasTakenInCurrentPeriod(period);
     }
 
-    private int checkMissedPeriods(int period){
+    private int checkMissedPeriods(int period) {
         int periodsSoll;
-        switch (period){
+        Log.v(TAG, "period: " + period);
+        switch (period) {
             case 10:
                 periodsSoll = 1;
                 break;
@@ -264,6 +288,7 @@ public class ControllerService extends Service implements Observer {
                 break;
             case 12:
                 periodsSoll = 5;
+                Log.v(TAG, "periodSoll 1: " + periodsSoll);
                 break;
             case 125:
                 periodsSoll = 6;
@@ -322,13 +347,14 @@ public class ControllerService extends Service implements Observer {
             default:
                 periodsSoll = 20;
         }
+        Log.v(TAG, "periodSoll: " + periodsSoll);
         return storage.getMissedPeriods(periodsSoll);
     }
 
     /*
        set alarms for taking a photo in randomly 1-15 seconds
      */
-    private void setGridAlarm(int period){
+    private void setGridAlarm(int period) {
         //tell datacollection service to register sensors
         startDataCollectionService(DataCollectionService.COMMAND_REGISTER);
 
@@ -342,8 +368,8 @@ public class ControllerService extends Service implements Observer {
 
         //calculate random delay of 1-5 seconds
         Random random = new Random();
-        int randomSec =  random.nextInt(16);
-        int randomMilisec =  random.nextInt(1000);
+        int randomSec = random.nextInt(16);
+        int randomMilisec = random.nextInt(1000);
 
         Calendar currentTime = Calendar.getInstance();
         currentTime.setTimeInMillis(System.currentTimeMillis());
@@ -361,13 +387,14 @@ public class ControllerService extends Service implements Observer {
 
         Calendar currentTime = Calendar.getInstance();
         currentTime.setTimeInMillis(System.currentTimeMillis());
-        int hour = currentTime.get(Calendar.HOUR);
+        int hour = currentTime.get(Calendar.HOUR_OF_DAY);
         int minute = currentTime.get(Calendar.MINUTE);
 
         int minuteRounded;
-        if (minute < 30){
+        if (minute < 30) {
             period = hour;
-        } if (minute >= 30){
+        }
+        if (minute >= 30) {
             String periodString = hour + "5";
             period = Integer.valueOf(periodString);
         }
@@ -376,14 +403,14 @@ public class ControllerService extends Service implements Observer {
         return period;
     }
 
-    private void cancelFutureAlarms(){
+    private void cancelFutureAlarms() {
         //TODO: loop necessary? theoretisch kann es nur ein pending intent sein
         int pendingIntentSize = pendingIntentArray.size();
-        if ( pendingIntentSize > 0){
-            for (int i=0; i<pendingIntentSize; i++){
+        if (pendingIntentSize > 0) {
+            for (int i = 0; i < pendingIntentSize; i++) {
                 try {
                     alarmManager.cancel(pendingIntentArray.get(i));
-                } catch (Exception e){
+                } catch (Exception e) {
                     Log.d(TAG, "alarm was not found in Array");
                 }
             }
@@ -397,9 +424,9 @@ public class ControllerService extends Service implements Observer {
         getApplicationContext().startService(capturePicServiceIntent);
         Log.v(TAG, "CapturePicService will be started now");
         return true;
-}
+    }
 
-    private void handleScreenOff(){
+    private void handleScreenOff() {
         cancelFutureAlarms();
         startDataCollectionService(DataCollectionService.COMMAND_UNREGISTER);
     }

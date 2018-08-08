@@ -146,6 +146,7 @@ public class Storage extends SQLiteOpenHelper {
     public void resetMissedPeriodsCounter(){
         photoAlarmsEditor.putInt("counter", 0);
         photoAlarmsEditor.commit();
+        Log.v(TAG, "periods counter resettet");
     }
 
 

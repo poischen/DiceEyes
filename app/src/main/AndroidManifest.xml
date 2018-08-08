@@ -37,6 +37,7 @@
 
         <receiver android:name=".AlarmController.PhotoAlarmReceiver" />
         <receiver android:name=".AlarmController.TransferReminderAlarmReceiver" />
+        <receiver android:name=".AlarmController.ResetReceiver" />
         <receiver
             android:name=".AlarmController.ScreenOnOffReceiver"
             android:enabled="true"

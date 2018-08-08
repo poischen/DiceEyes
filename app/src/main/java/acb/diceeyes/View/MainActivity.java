@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.menu_item_log:
                 sendLogViaMail();
+                break;
             default:
                 Toast.makeText(this, R.string.error_try_again, Toast.LENGTH_SHORT).show();
         }
