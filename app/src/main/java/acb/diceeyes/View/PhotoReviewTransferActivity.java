@@ -65,8 +65,6 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
     private PhotoReviewGridViewAdapter gridAdapter;
     private ArrayList<PhotoItem> pictureItems;
     private ArrayList<PhotoItem> taggedToDeleteItems = new ArrayList<>();
-    //private Button deleteButton;
-    //private Button uploadFTPButton;
     private ProgressBar progressBar;
     private ProgressDialog uploadProgressDialog;
     private ProgressDialog connectProgressDialog;
@@ -476,7 +474,7 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
                 con = new FTPClient();
                 con.connect(FTPHOST, FTPPORT);
 
-                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yy_HH-mm-ss");
+                DateFormat dateFormat = new SimpleDateFormat(getString(R.string.global_date_pattern));
                 String time = dateFormat.format(new Date());
 
                 if (con.login(FTPUSER, FTPPASSWORD)) {
@@ -487,7 +485,7 @@ public class PhotoReviewTransferActivity extends AppCompatActivity {
                     String dataBase = getDatabase();
                     File databaseFile = new File(dataBase);
                     FileInputStream inputDB = new FileInputStream(databaseFile);
-                    String remoteDB = "HDYHYPDataBase_" + time + ".db";
+                    String remoteDB = "DiceEyesDataBase_" + time + ".db";
                     boolean doneDB = con.storeFile(remoteDB, inputDB);
                     inputDB.close();
                     if (doneDB){
