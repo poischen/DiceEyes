@@ -229,7 +229,7 @@ public class ControllerService extends Service implements Observer {
                 currentTime.setTimeInMillis(System.currentTimeMillis());
                 int hour = currentTime.get(Calendar.HOUR_OF_DAY);
                 Log.v(TAG, "screen is on, do things now" + hour);
-                if (hour > 7 && hour < 21) {
+                if (hour > 10 && hour < 21) {
                     //check if it is necessary to take a picture in this period and set alarms if so
                     int period = calculatePeriod();
                     Log.v(TAG, "calculated period: " + period);
@@ -273,79 +273,76 @@ public class ControllerService extends Service implements Observer {
     private int checkMissedPeriods(int period) {
         int periodsSoll;
         Log.v(TAG, "period: " + period);
-        switch (period) {
-            case 10:
-                periodsSoll = 1;
-                break;
-            case 105:
-                periodsSoll = 2;
-                break;
-            case 11:
-                periodsSoll = 3;
-                break;
-            case 115:
-                periodsSoll = 4;
-                break;
-            case 12:
-                periodsSoll = 5;
-                Log.v(TAG, "periodSoll 1: " + periodsSoll);
-                break;
-            case 125:
-                periodsSoll = 6;
-                break;
-            case 13:
-                periodsSoll = 7;
-                break;
-            case 135:
-                periodsSoll = 8;
-                break;
-            case 14:
-                periodsSoll = 9;
-                break;
-            case 145:
-                periodsSoll = 10;
-                break;
-            case 15:
-                periodsSoll = 11;
-                break;
-            case 155:
-                periodsSoll = 12;
-                break;
-            case 16:
-                periodsSoll = 13;
-                break;
-            case 165:
-                periodsSoll = 14;
-                break;
-            case 17:
-                periodsSoll = 15;
-                break;
-            case 175:
-                periodsSoll = 16;
-                break;
-            case 18:
-                periodsSoll = 17;
-                break;
-            case 185:
-                periodsSoll = 18;
-                break;
-            case 19:
-                periodsSoll = 19;
-                break;
-            case 195:
-                periodsSoll = 20;
-                break;
-            /*case 20:
-                periodsSoll = 20;
-                break;
-            case 205:
-                periodsSoll = 20;
-                break;
-            case 215:
-                periodsSoll = 20;
-                break;*/
-            default:
-                periodsSoll = 20;
+        if (period < 10) {
+            periodsSoll = 0;
+        } else if (period > 20) {
+            periodsSoll = 20;
+        } else {
+            switch (period) {
+                case 10:
+                    periodsSoll = 1;
+                    break;
+                case 105:
+                    periodsSoll = 2;
+                    break;
+                case 11:
+                    periodsSoll = 3;
+                    break;
+                case 115:
+                    periodsSoll = 4;
+                    break;
+                case 12:
+                    periodsSoll = 5;
+                    Log.v(TAG, "periodSoll 1: " + periodsSoll);
+                    break;
+                case 125:
+                    periodsSoll = 6;
+                    break;
+                case 13:
+                    periodsSoll = 7;
+                    break;
+                case 135:
+                    periodsSoll = 8;
+                    break;
+                case 14:
+                    periodsSoll = 9;
+                    break;
+                case 145:
+                    periodsSoll = 10;
+                    break;
+                case 15:
+                    periodsSoll = 11;
+                    break;
+                case 155:
+                    periodsSoll = 12;
+                    break;
+                case 16:
+                    periodsSoll = 13;
+                    break;
+                case 165:
+                    periodsSoll = 14;
+                    break;
+                case 17:
+                    periodsSoll = 15;
+                    break;
+                case 175:
+                    periodsSoll = 16;
+                    break;
+                case 18:
+                    periodsSoll = 17;
+                    break;
+                case 185:
+                    periodsSoll = 18;
+                    break;
+                case 19:
+                    periodsSoll = 19;
+                    break;
+                case 195:
+                    periodsSoll = 20;
+                    break;
+                default:
+                    periodsSoll = 20;
+            }
         }
         Log.v(TAG, "periodSoll: " + periodsSoll);
         return storage.getMissedPeriods(periodsSoll);
