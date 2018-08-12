@@ -15,5 +15,4 @@
         android:title="@string/menu_item_review"
         app:showAsAction="never" />
 
-
 </menu>

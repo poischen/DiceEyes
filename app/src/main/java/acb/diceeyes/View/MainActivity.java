@@ -22,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -135,7 +137,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(permissionIntent);
                 break;
             case R.id.menu_item_log:
-                sendLogViaMail();
+                try {
+                    sendLogViaMail();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
             default:
                 Toast.makeText(this, R.string.error_try_again, Toast.LENGTH_SHORT).show();
@@ -171,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
     /*
     Sends logfile via mail
      */
-    private void sendLogViaMail() {
+    private void sendLogViaMail() throws IOException {
         Intent mailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
         mailIntent.setFlags(FLAG_ACTIVITY_NEW_TASK);
         mailIntent.setType("text/plain");
@@ -182,13 +188,28 @@ public class MainActivity extends AppCompatActivity {
         mailIntent.putExtra(Intent.EXTRA_TEXT, text);
         ArrayList<Uri> uris = new ArrayList<Uri>();
         File logfile = new File(createLogcat());
-        Uri u = Uri.fromFile(logfile);
-        uris.add(u);
+        Uri uLog = Uri.fromFile(logfile);
+        uris.add(uLog);
+
+        //db for testing
+        String sqlPath = storage.getWritableDatabase().getPath();
+        File databaseFile = new File(sqlPath);
+        FileInputStream inputDB = new FileInputStream(databaseFile);
+        String remoteDB = Storage.DB_NAME + ".db";
+        try {
+            inputDB.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Uri uDB = Uri.fromFile(databaseFile);
+        uris.add(uDB);
+
         mailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
         Intent shareIntent = Intent.createChooser(mailIntent, getString(R.string.log_mail_intent_title));
         shareIntent.setFlags(FLAG_ACTIVITY_NEW_TASK);
         getApplicationContext().startActivity(shareIntent);
     }
+    
 
     /*Starts a longlasting Service which controlls and triggers the gaze grid */
     private void startControllerService(){

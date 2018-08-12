@@ -52,14 +52,14 @@ import acb.diceeyes.Storage;
 public class PhotoReviewTransferActivity extends AppCompatActivity {
 
     private static final String TAG = PhotoReviewTransferActivity.class.getSimpleName();
-    private static final String FTPHOST = "ftp.mkhamis.com";
-    private static final String SFTPHOST = "phoneholder.medien.ifi.lmu.de";
+    private static final String FTPHOST = "";
+    private static final String SFTPHOST = "";
     private static final int FTPPORT = 21;
     private static final int SFTPPORT = 22022;
-    private static final String FTPUSER = "anita@mkhamis.com";
-    private static final String SFTPUSER = "phoneholder.app";
-    private static final String FTPPASSWORD = "dd)WN~AfiPtF";
-    private static final String SFTPPASSWORD = "gN4j+rt7s=6cRA";
+    private static final String FTPUSER = "";
+    private static final String SFTPUSER = "";
+    private static final String FTPPASSWORD = "";
+    private static final String SFTPPASSWORD = "";
 
     private GridView gridView;
     private PhotoReviewGridViewAdapter gridAdapter;
